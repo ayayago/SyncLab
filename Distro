@@ -1,1 +1,192 @@
 Mohon copy codingannya
+//Mutex Scheduler
+
+
+const readline = require("node:readline");
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+const processes = {
+  A: {
+    name: "Process A",
+    status: "READY",
+    localValue: null
+  },
+  B: {
+    name: "Process B",
+    status: "READY",
+    localValue: null
+  }
+};
+
+let counter = 0;
+let mutexLocked = false;
+let lockOwner = null;
+let currentStep = 0;
+
+// Urutan kejadian untuk latihan kita
+const steps = [
+  { process: "A", action: "lock" },
+  { process: "B", action: "lock" },
+  { process: "A", action: "read" },
+  { process: "A", action: "increment" },
+  { process: "A", action: "write" },
+  { process: "A", action: "unlock" },
+  { process: "B", action: "read" },
+  { process: "B", action: "increment" },
+  { process: "B", action: "write" },
+  { process: "B", action: "unlock" }
+];
+
+function showStatus() {
+  console.log("\n--- STATUS SYNCLAB ---");
+  console.log("Counter       :", counter);
+  console.log("Lock terkunci :", mutexLocked);
+  console.log("Pemilik lock  :", lockOwner ?? "Tidak ada");
+
+  for (const key of ["A", "B"]) {
+    const p = processes[key];
+
+    console.log(
+      `${p.name}: status=${p.status}, localValue=${p.localValue}`
+    );
+  }
+
+  console.log(`Langkah: ${currentStep}/${steps.length}`);
+}
+
+function executeStep(step) {
+  const p = processes[step.process];
+
+  console.log(`\nLangkah ${currentStep + 1}: ${p.name}`);
+
+  switch (step.action) {
+    case "lock":
+      if (!mutexLocked) {
+        mutexLocked = true;
+        lockOwner = step.process;
+        p.status = "RUNNING";
+
+        console.log(`${p.name} berhasil mendapatkan lock.`);
+      } else {
+        p.status = "WAITING";
+
+        console.log(
+          `${p.name} menunggu karena lock dipegang ${processes[lockOwner].name}.`
+        );
+      }
+      break;
+
+    case "read":
+      p.localValue = counter;
+      console.log(`${p.name} membaca counter = ${counter}`);
+      break;
+
+    case "increment":
+      p.localValue += 1;
+      console.log(`${p.name} menghitung nilai = ${p.localValue}`);
+      break;
+
+    case "write":
+      counter = p.localValue;
+      console.log(`${p.name} menulis counter = ${counter}`);
+      break;
+
+    case "unlock":
+      if (lockOwner !== step.process) {
+        console.log(`${p.name} tidak memiliki lock.`);
+        return;
+      }
+
+      mutexLocked = false;
+      lockOwner = null;
+      p.status = "READY";
+
+      console.log(`${p.name} melepaskan lock.`);
+
+      // Berikan lock kepada proses yang sedang menunggu
+      const waitingKey = Object.keys(processes).find(
+        key => processes[key].status === "WAITING"
+      );
+
+      if (waitingKey !== undefined) {
+        mutexLocked = true;
+        lockOwner = waitingKey;
+        processes[waitingKey].status = "RUNNING";
+
+        console.log(
+          `${processes[waitingKey].name} mendapatkan lock.`
+        );
+      }
+      break;
+  }
+
+  currentStep++;
+  showStatus();
+}
+
+function nextStep() {
+  if (currentStep >= steps.length) {
+    console.log("\nSimulasi sudah selesai!");
+    return;
+  }
+
+  executeStep(steps[currentStep]);
+}
+
+function runAll() {
+  while (currentStep < steps.length) {
+    executeStep(steps[currentStep]);
+  }
+}
+
+function resetSimulation() {
+  counter = 0;
+  mutexLocked = false;
+  lockOwner = null;
+  currentStep = 0;
+
+  for (const key of ["A", "B"]) {
+    processes[key].status = "READY";
+    processes[key].localValue = null;
+  }
+
+  console.log("\nSimulasi di-reset.");
+  showStatus();
+}
+
+async function main() {
+  console.log("=== SYNCLAB: MUTEX SCHEDULER ===");
+  showStatus();
+
+  while (true) {
+    console.log("\n1. Next Step");
+    console.log("2. Run All");
+    console.log("3. Reset");
+    console.log("4. Keluar");
+
+    const choice = (
+      await new Promise(resolve =>
+        rl.question("Pilih menu: ", resolve)
+      )
+    ).trim();
+
+    if (choice === "1") {
+      nextStep();
+    } else if (choice === "2") {
+      runAll();
+    } else if (choice === "3") {
+      resetSimulation();
+    } else if (choice === "4") {
+      rl.close();
+      break;
+    } else {
+      console.log("Pilihan tidak valid.");
+    }
+  }
+}
+
+main();
