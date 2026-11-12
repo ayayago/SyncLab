@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SyncLab — Simulator Sinkronisasi Proses</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Inter', system-ui, sans-serif; display: flex; flex-direction: column; height: 100vh; background: #fafbfc; color: #263238; }
+    .navbar { display: flex; justify-content: space-between; align-items: center; padding: 10px 24px; background: #fff; border-bottom: 1px solid #cfd8dc; flex-wrap: wrap; gap: 8px; }
+    .logo { background: none; border: 0; font-size: 1.3rem; font-weight: 700; color: #00897b; display: flex; gap: 8px; align-items: center; cursor: pointer; }
+    .logo-mark { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 8px; background: #00897b; color: #fff; }
+    nav { display: flex; gap: 4px; flex-wrap: wrap; }
+    .nav-link { background: none; border: 0; padding: 8px 14px; border-radius: 8px; color: #455a64; font-weight: 500; cursor: pointer; font-size: 0.95rem; }
+    .nav-link:hover { background: #eceff1; }
+    .nav-link.active { color: #00897b; background: #e0f2f1; font-weight: 600; }
+    iframe { flex: 1; width: 100%; border: none; }
+  </style>
+</head>
+<body>
+  <header class="navbar">
+    <button class="logo" onclick="bukaHalaman('beranda.html', 'nav-beranda')">
+      <span class="logo-mark">⟳</span> SyncLab
+    </button>
+    <nav>
+      <button id="nav-beranda" class="nav-link active" onclick="bukaHalaman('beranda.html', 'nav-beranda')">Beranda</button>
+      <button id="nav-simulasi" class="nav-link" onclick="bukaHalaman('simulasi.html', 'nav-simulasi')">Simulasi Modul</button>
+      <button id="nav-perbandingan" class="nav-link" onclick="bukaHalaman('perbandingan.html', 'nav-perbandingan')">Perbandingan</button>
+      <button id="nav-panduan" class="nav-link" onclick="bukaHalaman('panduan.html', 'nav-panduan')">Panduan</button>
+    </nav>
+  </header>
+
+  <iframe id="main-frame" src="beranda.html"></iframe>
+
+  <script>
+    function bukaHalaman(url, navId) {
+      document.getElementById('main-frame').src = url;
+      document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+      if (navId) document.getElementById(navId).classList.add('active');
+    }
+
+    // Menerima perintah pindah halaman dari dalam iframe (misal klik kartu di Beranda)
+    window.addEventListener('message', (event) => {
+      if (event.data.type === 'NAVIGATE') {
+        bukaHalaman(event.data.url, event.data.navId);
+      }
+    });
+  </script>
+</body>
+</html>
