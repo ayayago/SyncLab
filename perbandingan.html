@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SyncLab — Perbandingan</title>
+  <link rel="stylesheet" href="mainstyle.css" />
+</head>
+<body>
+  <header class="navbar">
+    <a href="homepage.html" class="logo">
+      <span class="logo-mark">⟳</span> SyncLab
+    </a>
+    <nav>
+      <a href="homepage.html" class="nav-link">Beranda</a>
+      <a href="simulasi.html" class="nav-link">Simulasi Modul</a>
+      <a href="perbandingan.html" class="nav-link active">Perbandingan</a>
+      <a href="panduan.html" class="nav-link">Panduan</a>
+    </nav>
+  </header>
+
+  <main class="main-content">
+    <div class="home-wrap">
+      <h1>Perbandingan Mekanisme Sinkronisasi</h1>
+      <p class="subtitle">Ringkasan karakteristik Mutex, Semaphore, dan Monitor pada masalah sinkronisasi.</p>
+      
+      <div class="card table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Mekanisme</th>
+              <th>Cara Kerja</th>
+              <th>Risiko Deadlock</th>
+              <th>Kelebihan Utama</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Mutex</strong></td>
+              <td>Mengunci satu resource pada satu waktu secara eksklusif.</td>
+              <td>Tinggi (jika urutan ambil tidak diatur)</td>
+              <td>Sederhana dan cepat untuk mutual exclusion tunggal.</td>
+            </tr>
+            <tr>
+              <td><strong>Semaphore</strong></td>
+              <td>Membatasi jumlah maksimum proses (N-1) yang boleh mengakses resource.</td>
+              <td>Bebas Deadlock</td>
+              <td>Menjamin minimal satu proses selalu bisa menyelesaikan tugasnya.</td>
+            </tr>
+            <tr>
+              <td><strong>Monitor</strong></td>
+              <td>Mengecek dan mengambil seluruh resource yang dibutuhkan sekaligus secara atomik.</td>
+              <td>Bebas Deadlock</td>
+              <td>Aman dari race condition dan mudah dipelihara.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
