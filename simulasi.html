@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulasi Modul</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Inter', system-ui, sans-serif; display: flex; flex-direction: column; height: 100vh; background: #fafbfc; }
+    .sub-bar { max-width: 1280px; width: 100%; margin: 0 auto; padding: 16px 16px 0; display: flex; justify-content: flex-end; }
+    .tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+    .tab { border: 1px solid #cfd8dc; background: #fff; padding: 6px 12px; border-radius: 20px; color: #455a64; font-size: .85rem; cursor: pointer; }
+    .tab.active { background: #455a64; color: #fff; border-color: #455a64; }
+    iframe { flex: 1; width: 100%; border: none; }
+  </style>
+</head>
+<body>
+  <div class="sub-bar">
+    <div class="tabs">
+      <button id="tab-1" class="tab active" onclick="pilihModul('modul-1/index.html', 'tab-1')">Race Condition</button>
+      <button id="tab-2" class="tab" onclick="pilihModul('modul-2/index.html', 'tab-2')">Dining Philosophers</button>
+      <button id="tab-3" class="tab" onclick="pilihModul('modul-3/index.html', 'tab-3')">Readers-Writers</button>
+    </div>
+  </div>
+
+  <iframe id="modul-frame" src="modul-1/index.html"></iframe>
+
+  <script>
+    function pilihModul(path, tabId) {
+      document.getElementById('modul-frame').src = path;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    // Cek apakah dibuka dari kartu tertentu di Beranda (misal simulasi.html?m=2)
+    const params = new URLSearchParams(window.location.search);
+    const m = params.get('m');
+    if (m === '2') pilihModul('modul-2/index.html', 'tab-2');
+    else if (m === '3') pilihModul('modul-3/index.html', 'tab-3');
+  </script>
+</body>
+</html>
