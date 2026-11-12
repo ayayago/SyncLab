@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SyncLab — Panduan</title>
+  <link rel="stylesheet" href="mainstyle.css" />
+</head>
+<body>
+  <header class="navbar">
+    <a href="homepage.html" class="logo">
+      <span class="logo-mark">⟳</span> SyncLab
+    </a>
+    <nav>
+      <a href="homepage.html" class="nav-link">Beranda</a>
+      <a href="simulasi.html" class="nav-link">Simulasi Modul</a>
+      <a href="perbandingan.html" class="nav-link">Perbandingan</a>
+      <a href="panduan.html" class="nav-link active">Panduan</a>
+    </nav>
+  </header>
+
+  <main class="main-content">
+    <div class="home-wrap">
+      <h1>Panduan Penggunaan SyncLab</h1>
+      <p class="subtitle">Ikuti langkah-langkah berikut untuk menjalankan simulasi sinkronisasi proses.</p>
+
+      <div class="card">
+        <ol class="guide-list">
+          <li>Pilih salah satu topik melalui menu <strong>Simulasi Modul</strong> atau klik langsung pada kartu modul di halaman <strong>Beranda</strong>.</li>
+          <li>Atur <strong>Mekanisme</strong> (Mutex, Semaphore, atau Monitor) dan jumlah proses pada panel <strong>Parameter</strong> di sebelah kiri.</li>
+          <li>Klik tombol <strong>Step →</strong> untuk mengamati perubahan state satu langkah demi satu langkah, atau klik <strong>▶ Auto Play</strong> untuk menjalankannya secara otomatis.</li>
+          <li>Perhatikan perubahan warna lingkaran proses serta riwayat kejadian pada panel <strong>Log & State</strong> di sebelah kanan untuk mendeteksi terjadinya <em>deadlock</em> atau <em>race condition</em>.</li>
+        </ol>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
