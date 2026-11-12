@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SyncLab — Beranda</title>
+  <link rel="stylesheet" href="mainstyle.css" />
+</head>
+<body>
+  <header class="navbar">
+    <a href="homepage.html" class="logo">
+      <span class="logo-mark">⟳</span> SyncLab
+    </a>
+    <nav>
+      <a href="homepage.html" class="nav-link active">Beranda</a>
+      <a href="simulasi.html" class="nav-link">Simulasi Modul</a>
+      <a href="perbandingan.html" class="nav-link">Perbandingan</a>
+      <a href="panduan.html" class="nav-link">Panduan</a>
+    </nav>
+  </header>
+
+  <main class="main-content">
+    <div class="home-wrap">
+      <h1>Pahami sinkronisasi proses lewat simulasi langkah demi langkah</h1>
+      <p class="subtitle">SyncLab membantu mahasiswa sistem operasi melihat apa yang terjadi di balik mutex, semaphore, dan monitor.</p>
+
+      <div class="cards">
+        <a href="simulasi.html?modul=1" class="card home-card">
+          <h3>Race Condition</h3>
+          <p>Amati lost update pada counter bersama, lalu bandingkan dengan Mutex.</p>
+        </a>
+
+        <a href="simulasi.html?modul=2" class="card home-card">
+          <h3>Dining Philosophers</h3>
+          <p>Coba Mutex, Semaphore, dan Monitor, lalu lihat kapan deadlock muncul.</p>
+        </a>
+
+        <a href="simulasi.html?modul=3" class="card home-card">
+          <h3>Readers-Writers</h3>
+          <p>Bandingkan kebijakan reader-preference dan writer-preference.</p>
+        </a>
+      </div>
+
+      <a href="perbandingan.html" class="btn-primary">Lihat Perbandingan</a>
+    </div>
+  </main>
+</body>
+</html>
