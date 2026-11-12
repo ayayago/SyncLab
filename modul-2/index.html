@@ -1,1 +1,78 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dining Philosophers Simulator</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="sim-head">
+      <div>
+        <h1>Dining Philosophers</h1>
+        <p>Filsuf bergantian berpikir dan makan dengan garpu yang dibagi bersama.</p>
+      </div>
+    </div>
 
+    <div class="sim-grid">
+      <!-- Panel Kiri: Parameter -->
+      <div class="panel">
+        <h3>Parameter</h3>
+        <div class="field">
+          <label class="field-label" for="mech-select">Mekanisme</label>
+          <select id="mech-select">
+            <option value="mutex">Mutex</option>
+            <option value="semaphore">Semaphore</option>
+            <option value="monitor" selected>Monitor</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="n-range">Jumlah proses: <span id="n-val">5</span></label>
+          <input type="range" id="n-range" min="3" max="8" value="5" />
+        </div>
+
+        <p class="note" id="mech-note">
+          Mutex mengambil garpu satu per satu sehingga bisa deadlock. Semaphore membatasi 4 filsuf di meja. Monitor mengambil kedua garpu sekaligus.
+        </p>
+      </div>
+
+      <!-- Panel Tengah: Visualisasi Meja -->
+      <div class="viz">
+        <div class="table-area" id="table-area">
+          <div class="round-table"><span>Meja</span></div>
+          <div id="forks-layer"></div>
+          <div id="philosophers-layer"></div>
+        </div>
+      </div>
+
+      <!-- Panel Kanan: Log & State -->
+      <div class="panel">
+        <h3>Log & State</h3>
+        <div class="log" id="log-box"></div>
+
+        <h4>Legend Status</h4>
+        <div class="legend">
+          <span class="badge ready">Berpikir</span>
+          <span class="badge waiting">Lapar/Menunggu</span>
+          <span class="badge running">Makan</span>
+          <span class="badge deadlock">Deadlock</span>
+        </div>
+
+        <div class="state-box" id="state-list"></div>
+      </div>
+    </div>
+
+    <!-- Action Bar Bawah -->
+    <div class="actionbar">
+      <button class="btn play" id="btn-play">▶ Auto Play</button>
+      <button class="btn dark" id="btn-step">Step →</button>
+      <button class="btn dark" id="btn-reset">↺ Reset</button>
+      <span class="step-count" id="step-count">Step: 0</span>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
