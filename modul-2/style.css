@@ -1,3 +1,24 @@
+:root {
+  --font: "Segoe UI", Arial, sans-serif;
+  --ink: #263238;
+  --bg: #f4f7f8;
+  --white: #ffffff;
+  --panel: #f8fafb;
+  --muted: #78909c;
+  --line: #cfd8dc;
+
+  --teal: #00897b;
+  --navy: #263b50;
+  --red: #e53935;
+  --gray: #90a4ae;
+  --green: #43a047;
+  --yellow: #ffca28;
+
+  --wood: #8d6e63;
+  --pad: 16px;
+  --radius: 10px;
+}
+
 * {
   box-sizing: border-box;
 }
