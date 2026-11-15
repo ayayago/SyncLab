@@ -1,1 +1,72 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Readers-Writers Simulator</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="sim-head">
+      <div>
+        <h1>Readers-Writers</h1>
+        <p>Banyak reader boleh membaca bersamaan, tetapi writer butuh akses eksklusif ke database.</p>
+      </div>
+    </div>
+
+    <div class="sim-grid">
+      <!-- Panel Kiri: Parameter -->
+      <div class="panel">
+        <h3>Parameter</h3>
+        <div class="field">
+          <label class="field-label" for="policy-select">Kebijakan</label>
+          <select id="policy-select">
+            <option value="reader" selected>Reader-preference</option>
+            <option value="writer">Writer-preference</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="readers-range">Jumlah reader: <span id="readers-val">4</span></label>
+          <input type="range" id="readers-range" min="1" max="6" value="4" />
+        </div>
+
+        <p class="note" id="policy-note"></p>
+      </div>
+
+      <!-- Panel Tengah: Visualisasi -->
+      <div class="viz">
+        <div class="rw-area" id="rw-area"></div>
+      </div>
+
+      <!-- Panel Kanan: Log & State -->
+      <div class="panel">
+        <h3>Log &amp; State</h3>
+        <div class="log" id="log-box"></div>
+
+        <h4>Legend Status</h4>
+        <div class="legend">
+          <span class="badge ready">Idle</span>
+          <span class="badge waiting">Menunggu</span>
+          <span class="badge running">Aktif</span>
+          <span class="badge done">Selesai</span>
+        </div>
+
+        <div class="state-box" id="state-list"></div>
+      </div>
+    </div>
+
+    <!-- Action Bar Bawah -->
+    <div class="actionbar">
+      <button class="btn play" id="btn-play">▶ Auto Play</button>
+      <button class="btn dark" id="btn-step">Step →</button>
+      <button class="btn dark" id="btn-reset">↺ Reset</button>
+      <span class="step-count" id="step-count">Step: 0</span>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
 
