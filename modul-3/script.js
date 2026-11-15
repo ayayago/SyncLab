@@ -226,4 +226,3 @@ btnReset.addEventListener('click', resetSimulation);
 
 // Inisialisasi Awal
 resetSimulation();
-
