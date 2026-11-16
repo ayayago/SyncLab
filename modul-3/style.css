@@ -12,14 +12,13 @@
   --gray: #90a4ae;
   --green: #43a047;
   --yellow: #ffca28;
-  --blue: #3b82f6;      /* identitas Reader */
-  --orange: #ea580c;    /* identitas Writer */
+  --blue: #3b82f6;      
+  --orange: #ea580c;    
   --pad: 16px;
   --radius: 10px;
-  --node-size: 62px;    /* diameter lingkaran R1, R2, W1, ... */
+  --node-size: 62px;    
 }
 
-/* Dasar Halaman */
 * {
   box-sizing: border-box;
 }
@@ -83,7 +82,6 @@ small {
   color: var(--muted);
 }
 
-/* kiri: parameter | tengah: visualisasi | kanan: log */
 .sim-grid {
   display: grid;
   grid-template-columns: 270px 1fr 320px;
@@ -148,14 +146,14 @@ button:focus-visible {
   outline-offset: 2px;
 }
 
-/* VISUALISASI READERS-WRITERS */
+/* Visualisasi Readers-Writers */
 .rw-area {
   position: relative;
   width: min(100%, 700px);
   aspect-ratio: 1.15 / 1;
 }
 
-/* Garis penghubung (SVG) berada paling bawah */
+/* Garis penghubung berada paling bawah */
 .rw-lines {
   position: absolute;
   inset: 0;
@@ -171,6 +169,11 @@ button:focus-visible {
   stroke-width: 2;
   fill: none;
   transition: stroke .3s;
+}
+
+.rw-line.waiting {
+  stroke: var(--yellow);
+  stroke-dasharray: 5 4;
 }
 
 /* Garis aktif */
@@ -204,7 +207,7 @@ button:focus-visible {
   color: var(--orange);
 }
 
-/* Kotak Database di tengah (menutupi ujung garis) */
+/* Kotak Database di tengah */
 .rw-db {
   position: absolute;
   left: 50%;
@@ -274,10 +277,10 @@ button:focus-visible {
   color: #fff;
   background: var(--gray);
   border: 3px solid #fff;
-  transition: background .3s, box-shadow .3s;
+  transition: background .3s, box-shadow .3s, transform .3s;
 }
 
-/* Cincin warna: Reader biru, Writer oranye */
+/* Cincin warna */
 .rw-node.reader .avatar {
   border-color: var(--blue);
 }
@@ -289,6 +292,7 @@ button:focus-visible {
 /* Warna isi lingkaran */
 .rw-node.running .avatar {
   background: var(--green);
+  transform: scale(1.12);
   animation: rw-pulse 1.4s ease-in-out infinite;
 }
 
@@ -317,7 +321,7 @@ button:focus-visible {
   --node-size: 40px;
 }
 
-/* Panel Kanan: Log & State */
+/* Panel kanan: Log & State */
 .log {
   background: #fff;
   border: 1px solid var(--line);
@@ -360,7 +364,7 @@ button:focus-visible {
   font-size: .85rem;
 }
 
-/* Ringkasan (reader aktif, writer menunggu, tunggu terlama) */
+/* Ringkasan */
 .state-summary {
   background: #fff;
   border: 1px solid var(--line);
@@ -421,7 +425,7 @@ button:focus-visible {
   background: var(--navy);
 }
 
-/* Action Bar (Play, Step, Reset) */
+/* Action Bar */
 .actionbar {
   display: flex;
   flex-wrap: wrap;
