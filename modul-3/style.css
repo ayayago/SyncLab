@@ -12,11 +12,14 @@
   --gray: #90a4ae;
   --green: #43a047;
   --yellow: #ffca28;
-  --wood: #8d6e63;
+  --blue: #3b82f6;      /* identitas Reader */
+  --orange: #ea580c;    /* identitas Writer */
   --pad: 16px;
   --radius: 10px;
+  --node-size: 62px;    /* diameter lingkaran R1, R2, W1, ... */
 }
 
+/* Dasar Halaman */
 * {
   box-sizing: border-box;
 }
@@ -65,7 +68,7 @@ small {
   padding: var(--pad);
 }
 
-/* Header & Grid */
+/* Header & Grid 3 Kolom */
 .sim-head {
   display: flex;
   justify-content: space-between;
@@ -80,6 +83,7 @@ small {
   color: var(--muted);
 }
 
+/* kiri: parameter | tengah: visualisasi | kanan: log */
 .sim-grid {
   display: grid;
   grid-template-columns: 270px 1fr 320px;
@@ -106,7 +110,7 @@ small {
   min-width: 0;
 }
 
-/* Form Controls */
+/* Form (Kebijakan & slider Reader) */
 .field {
   display: flex;
   flex-direction: column;
@@ -117,6 +121,11 @@ small {
 .field-label {
   font-size: .85rem;
   font-weight: 600;
+}
+
+#readers-val {
+  color: var(--teal);
+  font-weight: 700;
 }
 
 select {
@@ -139,7 +148,176 @@ button:focus-visible {
   outline-offset: 2px;
 }
 
-/* Log & State */
+/* VISUALISASI READERS-WRITERS */
+.rw-area {
+  position: relative;
+  width: min(100%, 700px);
+  aspect-ratio: 1.15 / 1;
+}
+
+/* Garis penghubung (SVG) berada paling bawah */
+.rw-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.rw-line {
+  stroke: var(--line);
+  stroke-width: 2;
+  fill: none;
+  transition: stroke .3s;
+}
+
+/* Garis aktif */
+.rw-line.running {
+  stroke-width: 3;
+}
+
+.rw-line.running[x1="14"] {
+  stroke: var(--blue);
+}
+
+.rw-line.running[x1="88"] {
+  stroke: var(--orange);
+}
+
+/* Tulisan "Reader" dan "Writer" di atas kolom lingkaran */
+.rw-label {
+  position: absolute;
+  top: 11%;
+  transform: translate(-50%, -50%);
+  font-size: .9rem;
+  font-weight: 600;
+  z-index: 2;
+}
+
+.rw-label.reader {
+  color: var(--blue);
+}
+
+.rw-label.writer {
+  color: var(--orange);
+}
+
+/* Kotak Database di tengah (menutupi ujung garis) */
+.rw-db {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 30%;
+  height: 28%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 8px;
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  background: #eef2f6;
+  font-weight: 700;
+  z-index: 1;
+  transition: background .3s, border-color .3s, box-shadow .3s;
+}
+
+.rw-db small {
+  display: block;
+  margin-top: 2px;
+  font-size: .75rem;
+  font-weight: 400;
+}
+
+.rw-db.reading {
+  background: #dbeafe;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, .15);
+}
+
+.rw-db.writing {
+  background: #ffedd5;
+  border-color: var(--orange);
+  box-shadow: 0 0 0 4px rgba(234, 88, 12, .15);
+}
+
+/* Lingkaran proses */
+.rw-node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.rw-node small {
+  position: absolute;     
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 3px;
+  font-size: .7rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.avatar {
+  width: var(--node-size);
+  height: var(--node-size);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: clamp(.7rem, calc(var(--node-size) * .26), 1rem);
+  font-weight: 700;
+  color: #fff;
+  background: var(--gray);
+  border: 3px solid #fff;
+  transition: background .3s, box-shadow .3s;
+}
+
+/* Cincin warna: Reader biru, Writer oranye */
+.rw-node.reader .avatar {
+  border-color: var(--blue);
+}
+
+.rw-node.writer .avatar {
+  border-color: var(--orange);
+}
+
+/* Warna isi lingkaran */
+.rw-node.running .avatar {
+  background: var(--green);
+  animation: rw-pulse 1.4s ease-in-out infinite;
+}
+
+.rw-node.waiting .avatar {
+  background: var(--yellow);
+  color: #3e2723;
+}
+
+.rw-node.done .avatar {
+  background: var(--navy);
+}
+
+/* status "ready" (idle) */
+
+@keyframes rw-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(67, 160, 71, .45); }
+  50%      { box-shadow: 0 0 0 7px rgba(67, 160, 71, 0); }
+}
+
+/* Kalau Reader 5 atau 6, lingkaran dikecilkan agar tidak bertumpuk */
+.rw-area:has(.rw-node.reader:nth-child(9)) {
+  --node-size: 46px;
+}
+
+.rw-area:has(.rw-node.reader:nth-child(10)) {
+  --node-size: 40px;
+}
+
+/* Panel Kanan: Log & State */
 .log {
   background: #fff;
   border: 1px solid var(--line);
@@ -154,6 +332,7 @@ button:focus-visible {
 .log-line {
   padding: 3px 4px;
   border-bottom: 1px dashed #eceff1;
+  overflow-wrap: anywhere;
 }
 
 .log-line.last {
@@ -161,9 +340,11 @@ button:focus-visible {
   font-weight: 600;
 }
 
-.log-line.bad {
-  color: var(--red);
-  font-weight: 600;
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
 }
 
 .state-box {
@@ -179,16 +360,71 @@ button:focus-visible {
   font-size: .85rem;
 }
 
-.legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+/* Ringkasan (reader aktif, writer menunggu, tunggu terlama) */
+.state-summary {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 6px 12px;
   margin-bottom: 8px;
 }
 
-/* Actionbar */
+.state-summary .state-row {
+  border-bottom: 1px dashed #eceff1;
+}
+
+.state-summary .state-row:last-of-type {
+  border-bottom: 0;
+}
+
+.state-summary b {
+  color: var(--teal);
+}
+
+/* Peringatan starvation */
+.starvation {
+  margin-top: 6px;
+  padding: 5px 10px;
+  border-left: 3px solid var(--red);
+  border-radius: 4px;
+  background: #fdecea;
+  color: var(--red);
+  font-size: .82rem;
+  font-weight: 700;
+}
+
+/* Badge Status */
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: .75rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--gray);
+}
+
+.badge.ready {
+  background: var(--gray);
+}
+
+.badge.waiting {
+  background: var(--yellow);
+  color: #3e2723;
+}
+
+.badge.running {
+  background: var(--green);
+}
+
+.badge.done {
+  background: var(--navy);
+}
+
+/* Action Bar (Play, Step, Reset) */
 .actionbar {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   align-items: center;
   padding: 12px var(--pad);
@@ -231,170 +467,9 @@ button:focus-visible {
   cursor: not-allowed;
 }
 
-/* Badge & Avatar */
-.badge {
-  display: inline-block;
-  padding: 2px 10px;
-  border-radius: 12px;
-  font-size: .75rem;
-  font-weight: 600;
-  color: #fff;
-  background: var(--gray);
-}
+/* Responsif */
 
-.badge.running {
-  background: var(--green);
-}
-
-.badge.waiting {
-  background: var(--yellow);
-  color: #3e2723;
-}
-
-.badge.deadlock {
-  background: var(--red);
-}
-
-.badge.done {
-  background: var(--navy);
-}
-
-.badge.ready {
-  background: var(--gray);
-}
-
-.avatar {
-  width: 54px;
-  height: 54px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-weight: 700;
-  color: #fff;
-  background: var(--gray);
-  border: 3px solid #fff;
-  box-shadow: 0 0 0 2px var(--line);
-  transition: all .3s;
-}
-
-.running .avatar {
-  background: var(--green);
-  box-shadow: 0 0 0 3px #a5d6a7;
-}
-
-.waiting .avatar {
-  background: var(--yellow);
-  box-shadow: 0 0 0 3px #ffe082;
-}
-
-.deadlock .avatar {
-  background: var(--red);
-  box-shadow: 0 0 0 3px #ef9a9a;
-  animation: shake .4s infinite;
-}
-
-.done .avatar {
-  background: var(--navy);
-}
-
-@keyframes shake {
-
-  0%,
-  100% {
-    transform: translateX(-2px);
-  }
-
-  50% {
-    transform: translateX(2px);
-  }
-}
-
-/* Dining Philosophers Visualization */
-.table-area {
-  position: relative;
-  width: min(100%, 480px);
-  aspect-ratio: 1;
-}
-
-.round-table {
-  position: absolute;
-  inset: 22%;
-  border-radius: 50%;
-  background: radial-gradient(circle,
-      #a98265 0%,
-      #8d6e63 65%,
-      #65483b 100%);
-  border: 7px solid #65483b;
-  box-shadow:
-    inset 0 0 0 3px #c6a17e,
-    inset 0 0 18px #493329,
-    0 8px 18px #26323835;
-  display: grid;
-  place-items: center;
-  color: #fff1df;
-  font-weight: 700;
-  letter-spacing: 2px;
-}
-
-/*Piring*/
-.round-table {
-  position: absolute;
-}
-
-.round-table::before {
-  content: "";
-  position: absolute;
-  width: 105px;
-  height: 105px;
-  border-radius: 50%;
-  background: radial-gradient(circle,
-      #ffffff 55%,
-      #e0e0e0 57%,
-      #ffffff 65%,
-      #b0bec5 70%,
-      #ffffff 73%);
-  box-shadow: 0 4px 10px #26323840;
-}
-
-/*Makanan*/
-.round-table::after {
-  content: "🍗";
-  position: absolute;
-  font-size: 38px;
-  z-index: 2;
-  filter: drop-shadow(0 2px 2px #0003);
-}
-
-.philosopher {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  transition: all .3s;
-}
-
-.philosopher small {
-  display: block;
-  font-size: .7rem;
-  margin-top: 2px;
-}
-
-.fork {
-  position: absolute;
-  width: 6px;
-  height: 36px;
-  border-radius: 3px;
-  background: #cfd8dc;
-  border: 1px solid #78909c;
-  transition: all .5s ease;
-}
-
-.fork.held {
-
-  background: var(--green);
-  border-color: #2e7d32;
-  box-shadow: 0 0 8px #66bb6a;
-}
-
+/* Tablet & di bawahnya: 3 kolom ditumpuk jadi 1 kolom */
 @media (max-width: 960px) {
   .sim-grid {
     grid-template-columns: 1fr;
@@ -406,117 +481,57 @@ button:focus-visible {
   }
 }
 
-/* =========================================================
-   READERS-WRITERS (Modul 3) — memakai variabel & komponen di atas
-   ========================================================= */
-:root {
-  --reader: #42a5f5;
-  --writer: #fb8c00;
+/* Mobile */
+@media (max-width: 600px) {
+  :root {
+    --pad: 12px;
+    --node-size: 42px;
+  }
+
+  h1 {
+    font-size: 1.3rem;
+  }
+
+  /* area dibuat lebih tinggi supaya 6 reader tidak bertumpuk */
+  .rw-area {
+    aspect-ratio: .8 / 1;
+  }
+
+  .rw-area:has(.rw-node.reader:nth-child(9)) {
+    --node-size: 36px;
+  }
+
+  .rw-area:has(.rw-node.reader:nth-child(10)) {
+    --node-size: 34px;
+  }
+
+  .rw-node small {
+    display: none;   
+  }
+
+  .rw-db {
+    width: 36%;
+    font-size: .8rem;
+    padding: 4px;
+  }
+
+  .rw-db small {
+    font-size: .65rem;
+  }
+
+  .rw-label {
+    font-size: .8rem;
+  }
+
+  .btn {
+    padding: 9px 16px;
+    font-size: .88rem;
+  }
 }
 
-.rw-area {
-  position: relative;
-  width: 100%;
-  height: 400px;
-}
-
-.rw-lines {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.rw-line {
-  stroke: var(--line);
-  stroke-width: 1.5;
-  transition: stroke .3s;
-}
-
-.rw-line.waiting {
-  stroke: var(--yellow);
-  stroke-dasharray: 5 4;
-}
-
-.rw-line.running {
-  stroke: var(--green);
-  stroke-width: 3;
-}
-
-.rw-label {
-  position: absolute;
-  top: 3%;
-  transform: translateX(-50%);
-  font-size: .8rem;
-  font-weight: 600;
-}
-
-.rw-label.reader { color: var(--reader); }
-.rw-label.writer { color: var(--writer); }
-
-.rw-db {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 140px;
-  padding: 18px 8px;
-  text-align: center;
-  font-weight: 600;
-  background: var(--panel);
-  border: 2px solid var(--line);
-  border-radius: 14px;
-  transition: all .3s;
-}
-
-.rw-db small {
-  display: block;
-  font-weight: 400;
-  font-size: .72rem;
-}
-
-.rw-db.reading {
-  background: #e8f5e9;
-  border-color: var(--green);
-  box-shadow: 0 0 12px #81c78466;
-}
-
-.rw-db.writing {
-  background: #fff3e0;
-  border-color: var(--writer);
-  box-shadow: 0 0 12px #ffb74d66;
-}
-
-.rw-node {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  text-align: center;
-}
-
-.rw-node small {
-  display: block;
-  font-size: .68rem;
-  margin-top: 2px;
-}
-
-/* cincin warna jenis proses (reader biru, writer oranye); isi avatar = status */
-.rw-node.reader .avatar { box-shadow: 0 0 0 3px var(--reader); }
-.rw-node.writer .avatar { box-shadow: 0 0 0 3px var(--writer); }
-.rw-node.running .avatar { transform: scale(1.12); }
-
-.state-summary {
-  margin-bottom: 10px;
-  padding-bottom: 8px;
-  border-bottom: 1px dashed var(--line);
-}
-
-.starvation {
-  color: var(--red);
-  font-weight: 700;
-  font-size: .85rem;
-  padding: 4px 0;
-}
-
-@media (max-width: 960px) {
-  .rw-area { height: 340px; }
+/* Pengguna yang mematikan animasi */
+@media (prefers-reduced-motion: reduce) {
+  .rw-node.running .avatar {
+    animation: none;
+  }
 }
