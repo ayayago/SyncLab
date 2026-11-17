@@ -63,46 +63,69 @@ function stepRW() {
   const all = Object.values(s.procs);
   const active = () => all.filter((p) => p.status === 'active');
   const waiting = (t) => all.filter((p) => p.status === 'waiting' && p.type === t);
-  const startRead = (p) => { p.status = 'active'; p.left = READ_TIME; L(`${p.id} mulai membaca`); };
+  const ids = (arr) => arr.map((p) => p.id).join(', ');
+  const startRead = (arr) => {
+    arr.forEach((p) => { p.status = 'active'; p.left = READ_TIME; });
+    L(`${ids(arr)} mulai membaca`);
+  };
   const startWrite = (p) => { p.status = 'active'; p.left = WRITE_TIME; L(`${p.id} mulai menulis`); };
   const wait = (p) => { p.status = 'waiting'; p.waitSince = s.currentStep; L(`${p.id} menunggu`); };
 
-  // 1) waktu berjalan: proses aktif berkurang, yang habis akan selesai
-  active().filter((p) => --p.left <= 0).forEach((p) => {
-    p.status = 'idle';
-    p.finished = true;
-    L(`${p.id} selesai`);
-  });
+  // Setiap Step: waktu berjalan 1 satuan, lalu TEPAT SATU kejadian dicatat di log.
+  active().forEach((p) => p.left--);
 
-  // 2) admit proses yang menunggu sesuai kebijakan
-  if (!active().some((p) => p.type === 'writer')) {
-    const wr = waiting('reader');
-    const wt = waiting('writer');
-    const none = active().length === 0;
-    if (s.policy === 'reader') {
-      if (wr.length) wr.forEach(startRead);
-      else if (none && wt.length) startWrite(wt[0]);
-    } else if (none) {
-      if (wt.length) startWrite(wt[0]);
-      else wr.forEach(startRead);
-    }
-  }
+  // Kejadian 1: proses yang waktunya habis selesai
+  const finish = () => {
+    const ended = active().filter((p) => p.left <= 0);
+    if (!ended.length) return false;
+    ended.forEach((p) => { p.status = 'idle'; p.finished = true; });
+    L(`${ids(ended)} selesai`);
+    return true;
+  };
 
-  // 3) kedatangan proses berikutnya
-  if (s.queue.length) {
+  // Kejadian 2: proses berikutnya datang (langsung jalan atau menunggu)
+  const arrive = () => {
+    if (!s.queue.length) return false;
     const p = s.procs[s.queue.shift()];
     if (p.type === 'reader') {
       const blocked = active().some((x) => x.type === 'writer') ||
         (s.policy === 'writer' && waiting('writer').length > 0);
-      blocked ? wait(p) : startRead(p);
+      blocked ? wait(p) : startRead([p]);
     } else {
-      active().length === 0 ? startWrite(p) : wait(p);
+      const free = active().length === 0 && !waiting('reader').length && !waiting('writer').length;
+      free ? startWrite(p) : wait(p);
     }
+    return true;
+  };
+
+  // Kejadian 3: proses yang menunggu dimasukkan sesuai kebijakan
+  const admit = () => {
+    if (active().some((x) => x.type === 'writer')) return false;
+    const wr = waiting('reader');
+    const wt = waiting('writer');
+    const none = active().length === 0;
+    if (s.policy === 'reader') {
+      if (wr.length) { startRead(wr); return true; }
+      if (none && wt.length) { startWrite(wt[0]); return true; }
+    } else if (none) {
+      if (wt.length) { startWrite(wt[0]); return true; }
+      if (wr.length) { startRead(wr); return true; }
+    }
+    return false;
+  };
+
+  // Urutan prioritas = inti kebijakan:
+  // reader-preference: reader yang datang didahulukan sebelum writer yang antre.
+  // writer-preference: writer yang antre didahulukan sebelum proses yang baru datang.
+  const order = s.policy === 'reader' ? [finish, arrive, admit] : [finish, admit, arrive];
+  if (!order.some((fn) => fn())) {
+    const a = active();
+    L(a.length ? `${ids(a)} masih ${a[0].type === 'reader' ? 'membaca' : 'menulis'}` : 'tidak ada perubahan');
   }
 
   if (!s.queue.length && all.every((p) => p.status === 'idle')) {
     s.done = true;
-    L('Selesai. Semua reader dan writer sudah mengakses database ✓');
+    s.logs.push('Selesai. Semua reader dan writer sudah mengakses database ✓');
   }
 
   if (s.done) stopAutoPlay();
