@@ -539,3 +539,64 @@ button:focus-visible {
     animation: none;
   }
 }
+
+/* ===== FIFO / Fair: tampilan antrean menunggu ===== */
+.rw-queue {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: max-content;
+  max-width: 100%;
+  padding: 6px 14px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: .8rem;
+  z-index: 2;
+}
+
+.rw-queue-title {
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.q-chip {
+  display: inline-block;
+  padding: 1px 10px;
+  border-radius: 999px;
+  border: 2px solid var(--blue);
+  background: #fff;
+  color: var(--blue);
+  font-weight: 700;
+}
+
+.q-chip.writer {
+  border-color: var(--orange);
+  color: var(--orange);
+}
+
+/* proses paling depan = dilayani berikutnya */
+.q-chip.head {
+  background: var(--yellow);
+  color: #3e2723;
+  box-shadow: 0 0 0 3px rgba(0, 137, 123, .35);
+}
+
+.q-arrow,
+.q-empty {
+  color: var(--muted);
+}
+
+@media (max-width: 600px) {
+  .rw-queue {
+    font-size: .7rem;
+    padding: 4px 8px;
+    gap: 4px;
+  }
+}
