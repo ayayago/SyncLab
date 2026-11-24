@@ -397,6 +397,13 @@ button:focus-visible {
   font-weight: 700;
 }
 
+/* Tidak ada starvation */
+.starvation.ok {             
+  border-left-color: var(--green);
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
 /* Badge Status */
 .badge {
   display: inline-block;
