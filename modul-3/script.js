@@ -1,12 +1,16 @@
 const READ_TIME = 3;    // langkah yang dibutuhkan reader untuk membaca
-const WRITE_TIME = 2;   // langkah yang dibutuhkan writer untuk menulis
-const STARVE_AT = 4;    // writer menunggu >= N langkah => indikasi starvation
+const WRITE_TIME = 4;   // langkah yang dibutuhkan writer untuk menulis
 
 const POLICY_NOTE = {
   reader: 'Reader-preference: reader boleh masuk selama tidak ada writer aktif, sehingga writer bisa kelaparan (starvation).',
-  writer: 'Writer-preference: reader baru menunggu jika ada writer yang antre, sehingga writer lebih cepat dilayani.'
+  writer: 'Writer-preference: reader baru menunggu jika ada writer yang antre, sehingga writer lebih cepat dilayani.',
+  fifo: 'FIFO / Fair: semua proses dilayani sesuai urutan datang, tanpa ada yang dilewati. Reader yang berurutan di antrean boleh membaca bersamaan.'
 };
-const POLICY_LABEL = { reader: 'Reader-preference', writer: 'Writer-preference' };
+const POLICY_LABEL = {
+  reader: 'Reader-preference',
+  writer: 'Writer-preference',
+  fifo: 'FIFO / Fair'
+};
 
 let state = null;
 let timer = null;
@@ -42,12 +46,14 @@ function initRW({ policy, readers }) {
       status: 'idle',      // idle | waiting | active
       left: 0,
       waitSince: 0,
-      finished: false
+      finished: false,
+      served: false        // BARU: sudah pernah dilayani
     };
   });
   return {
     policy,
     procs,
+    order: Object.fromEntries(queue.map((id, i) => [id, i])),   // BARU: urutan datang (untuk FIFO)
     queue,
     currentStep: 0,
     done: false,
@@ -62,13 +68,19 @@ function stepRW() {
   const L = (m) => s.logs.push(`Step ${s.currentStep}: ${m}`);
   const all = Object.values(s.procs);
   const active = () => all.filter((p) => p.status === 'active');
-  const waiting = (t) => all.filter((p) => p.status === 'waiting' && p.type === t);
+  // UBAH: parameter t boleh kosong (semua jenis), hasil diurutkan menurut urutan datang
+  const waiting = (t) => all
+    .filter((p) => p.status === 'waiting' && (!t || p.type === t))
+    .sort((a, b) => s.order[a.id] - s.order[b.id]);
   const ids = (arr) => arr.map((p) => p.id).join(', ');
   const startRead = (arr) => {
-    arr.forEach((p) => { p.status = 'active'; p.left = READ_TIME; });
+    arr.forEach((p) => { p.status = 'active'; p.left = READ_TIME; p.served = true; });   // UBAH: served
     L(`${ids(arr)} mulai membaca`);
   };
-  const startWrite = (p) => { p.status = 'active'; p.left = WRITE_TIME; L(`${p.id} mulai menulis`); };
+  const startWrite = (p) => {
+    p.status = 'active'; p.left = WRITE_TIME; p.served = true;                          // UBAH: served
+    L(`${p.id} mulai menulis`);
+  };
   const wait = (p) => { p.status = 'waiting'; p.waitSince = s.currentStep; L(`${p.id} menunggu`); };
 
   // Setiap Step: waktu berjalan 1 satuan, lalu TEPAT SATU kejadian dicatat di log.
@@ -89,10 +101,11 @@ function stepRW() {
     const p = s.procs[s.queue.shift()];
     if (p.type === 'reader') {
       const blocked = active().some((x) => x.type === 'writer') ||
-        (s.policy === 'writer' && waiting('writer').length > 0);
+        (s.policy === 'writer' && waiting('writer').length > 0) ||
+        (s.policy === 'fifo' && waiting().length > 0);                 // BARU: FIFO tidak boleh menyalip antrean
       blocked ? wait(p) : startRead([p]);
     } else {
-      const free = active().length === 0 && !waiting('reader').length && !waiting('writer').length;
+      const free = active().length === 0 && waiting().length === 0;    // UBAH (artinya sama, lebih ringkas)
       free ? startWrite(p) : wait(p);
     }
     return true;
@@ -107,7 +120,18 @@ function stepRW() {
     if (s.policy === 'reader') {
       if (wr.length) { startRead(wr); return true; }
       if (none && wt.length) { startWrite(wt[0]); return true; }
-    } else if (none) {
+    } else if (s.policy === 'fifo') {                                  // BARU: layani sesuai urutan datang
+      const q = waiting();
+      if (!q.length) return false;
+      if (q[0].type === 'writer') {
+        if (none) { startWrite(q[0]); return true; }
+        return false;
+      }
+      const batch = [];                                                // reader berurutan di depan antrean masuk bersama
+      for (const x of q) { if (x.type === 'reader') batch.push(x); else break; }
+      startRead(batch);
+      return true;
+    } else if (none) {                                                 // writer-preference
       if (wt.length) { startWrite(wt[0]); return true; }
       if (wr.length) { startRead(wr); return true; }
     }
@@ -116,11 +140,17 @@ function stepRW() {
 
   // Urutan prioritas = inti kebijakan:
   // reader-preference: reader yang datang didahulukan sebelum writer yang antre.
-  // writer-preference: writer yang antre didahulukan sebelum proses yang baru datang.
+  // writer-preference & FIFO: yang antre didahulukan sebelum proses yang baru datang.
   const order = s.policy === 'reader' ? [finish, arrive, admit] : [finish, admit, arrive];
-  if (!order.some((fn) => fn())) {
-    const a = active();
-    L(a.length ? `${ids(a)} masih ${a[0].type === 'reader' ? 'membaca' : 'menulis'}` : 'tidak ada perubahan');
+  const eventHappened = order.some((fn) => fn());
+
+  const totalOf = (p) => (p.type === 'reader' ? READ_TIME : WRITE_TIME);
+  const progress = (p) => `${p.id} sedang ${p.type === 'reader' ? 'membaca' : 'menulis'} (${totalOf(p) - p.left}/${totalOf(p)})`;
+  const running = active().filter((p) => p.left < totalOf(p));
+  if (!eventHappened) {
+    L(running.length ? running.map(progress).join(', ') : 'tidak ada perubahan');
+  } else if (running.length) {
+    s.logs[s.logs.length - 1] += ' · ' + running.map(progress).join(', ');   // tempel di baris Step yang sama
   }
 
   if (!s.queue.length && all.every((p) => p.status === 'idle')) {
@@ -131,7 +161,6 @@ function stepRW() {
   if (s.done) stopAutoPlay();
   render();
 }
-
 function getStatusClass(p) {
   if (p.status === 'active') return 'running';
   if (p.status === 'waiting') return 'waiting';
@@ -140,7 +169,10 @@ function getStatusClass(p) {
 }
 
 function getStatusLabel(p) {
-  if (p.status === 'active') return p.type === 'reader' ? 'Membaca' : 'Menulis';
+    if (p.status === 'active') {                                         
+    const total = p.type === 'reader' ? READ_TIME : WRITE_TIME;
+    return `${p.type === 'reader' ? 'Membaca' : 'Menulis'} (${total - p.left}/${total})`;
+  }
   if (p.status === 'waiting') return 'Menunggu';
   if (p.finished) return 'Selesai';
   return 'Idle';
@@ -164,6 +196,20 @@ function render() {
     : actR.length ? `dibaca oleh ${actR.map((p) => p.id).join(', ')}` : 'kosong';
   const dbClass = actW.length ? 'writing' : actR.length ? 'reading' : '';
 
+  // BARU: antrean FIFO (proses yang menunggu, urut kedatangan)
+  const queueList = list
+    .filter((p) => p.status === 'waiting')
+    .sort((a, b) => state.order[a.id] - state.order[b.id]);
+  const queueHtml = state.policy === 'fifo'
+    ? `<div class="rw-queue"><span class="rw-queue-title">Antrean FIFO</span>` +
+      (queueList.length
+        ? `<small>depan</small>` +
+          queueList.map((p, i) => `<span class="q-chip ${p.type}${i === 0 ? ' head' : ''}">${p.id}</span>`).join('<span class="q-arrow">→</span>') +
+          `<small>belakang</small>`
+        : `<span class="q-empty">kosong</span>`) +
+      `</div>`
+    : '';
+
   // 1. Render Visualisasi
   rwArea.innerHTML =
     `<svg class="rw-lines" viewBox="0 0 100 100" preserveAspectRatio="none">` +
@@ -174,6 +220,7 @@ function render() {
     `<div class="rw-label reader" style="left:14%">Reader</div>` +
     `<div class="rw-label writer" style="left:88%">Writer</div>` +
     `<div class="rw-db ${dbClass}">Database<small>${dbText}</small></div>` +
+    queueHtml +
     nodes.map(({ p, x, y }) => `
       <div class="rw-node ${p.type} ${getStatusClass(p)}" style="left:${x}%; top:${y}%">
         <div class="avatar">${p.id}</div>
@@ -192,14 +239,17 @@ function render() {
   const longest = list
     .filter((p) => p.status === 'waiting')
     .reduce((m, p) => Math.max(m, state.currentStep - p.waitSince), 0);
-  const starving = waitW.length > 0 && longest >= STARVE_AT;
+  // UBAH: starvation = ada proses menunggu yang DILEWATI proses yang datang lebih belakangan
+  const overtaken = list.filter((w) => w.status === 'waiting' &&
+    list.some((x) => x.served && state.order[x.id] > state.order[w.id]));
+  const starving = overtaken.length > 0;
 
   stateList.innerHTML = `
     <div class="state-summary">
       <div class="state-row"><span>Reader aktif</span><b>${actR.length}</b></div>
       <div class="state-row"><span>Writer menunggu</span><b>${waitW.length}</b></div>
       <div class="state-row"><span>Tunggu terlama</span><b>${longest} langkah</b></div>
-      ${starving ? '<div class="starvation">Indikasi starvation</div>' : ''}
+      ${starving ? `<div class="starvation">Indikasi starvation: ${overtaken.map((p) => p.id).join(', ')} dilewati</div>` : ''}
     </div>` +
     list.map((p) => `
       <div class="state-row">
