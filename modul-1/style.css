@@ -357,7 +357,7 @@ button:focus-visible {
   justify-content: center;
   flex-wrap: wrap;
   gap: 36px;
-  margin-bottom: 40px; /* ruang untuk panah */
+  margin-bottom: 40px;
 }
 
 .thread {
@@ -426,23 +426,168 @@ button:focus-visible {
 }
 
 @keyframes bump {
-  0% {
-    transform: scale(1);
-  }
-
-  40% {
-    transform: scale(1.3);
-  }
-
-  100% {
-    transform: scale(1);
-  }
+  0% { transform: scale(1); }
+  40% { transform: scale(1.3); }
+  100% { transform: scale(1); }
 }
 
 .counter-label {
   font-size: .85rem;
   font-weight: 600;
   color: var(--muted);
+}
+
+/* ==========================================
+   POP-UP MODAL PERBANDINGAN RACE CONDITION
+   ========================================== */
+.btn-compare {
+  background: var(--teal);
+  color: var(--white);
+  border: 0;
+  padding: 9px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: .88rem;
+}
+
+.btn-compare:hover {
+  filter: brightness(1.08);
+}
+
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(38, 50, 56, 0.55);
+  z-index: 999;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+}
+
+.modal-overlay.show {
+  display: flex;
+}
+
+.modal-box {
+  background: var(--white);
+  width: 100%;
+  max-width: 840px;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+  animation: popIn .18s ease-out;
+}
+
+@keyframes popIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.modal-header h2 {
+  margin: 0 0 4px;
+  font-size: 1.25rem;
+  color: var(--ink);
+}
+
+.modal-header p {
+  margin: 0;
+  font-size: .85rem;
+  color: var(--muted);
+}
+
+.btn-close {
+  background: none;
+  border: 0;
+  font-size: 1.2rem;
+  color: var(--muted);
+  padding: 4px 8px;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--line);
+}
+
+.compare-table thead tr {
+  background: #0d7367;
+  color: var(--white);
+}
+
+.compare-table th,
+.compare-table td {
+  padding: 14px 12px;
+  text-align: center;
+  border-bottom: 1px solid #eceff1;
+  font-size: .9rem;
+}
+
+.compare-table th:first-child,
+.compare-table td:first-child {
+  text-align: left;
+  padding-left: 20px;
+}
+
+.eval-badge {
+  display: inline-block;
+  min-width: 76px;
+  text-align: center;
+  padding: 5px 12px;
+  border-radius: 4px;
+  font-size: .8rem;
+  font-weight: 600;
+}
+
+.eval-badge.buruk {
+  background: #f8d7da;
+  color: #842029;
+}
+
+.eval-badge.baik {
+  background: #d1e7dd;
+  color: #0f5132;
+}
+
+.eval-badge.terbaik {
+  background: #4caf68;
+  color: #ffffff;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.btn-secondary {
+  background: #eceff1;
+  color: #455a64;
+  border: 0;
+  padding: 9px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.btn-primary {
+  background: var(--navy);
+  color: var(--white);
+  border: 0;
+  padding: 9px 18px;
+  border-radius: 8px;
+  font-weight: 600;
 }
 
 @media (max-width: 960px) {
@@ -470,4 +615,3 @@ button:focus-visible {
     animation: none;
   }
 }
-
