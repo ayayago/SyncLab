@@ -6,11 +6,13 @@ const OPS = {
 
 const MECH_LABEL = {
   none: 'Tanpa Mutex',
+  peterson: 'Dengan Peterson',
   mutex: 'Dengan Mutex'
 };
 
 const MECH_NOTE = {
   none: 'Tanpa mutex, semua thread membaca nilai yang sama lebih dulu, lalu menimpa hasil satu sama lain (lost update).',
+  peterson: 'Dengan Peterson, thread mengangkat flag lalu mengalah (turn) ke thread lain. Thread hanya masuk critical section jika tidak ada thread lain yang ingin masuk atau gilirannya sudah tiba. Untuk >2 thread dipakai versi umumnya (Filter Algorithm).',
   mutex: 'Dengan mutex, thread mengunci counter sebelum membaca dan baru melepasnya setelah menulis, sehingga bergantian.'
 };
 
@@ -68,6 +70,8 @@ function initRace({ mechanism, n, init, op }) {
     counter: init,
     lock: null,   // thread yang memegang mutex
     active: null, // thread yang baru saja bergerak
+    level: Array(n).fill(0),     // Peterson: flag/level tiap thread (0 = tidak ingin masuk)
+    victim: Array(n).fill(null), // Peterson: turn/victim per level
     th: Array.from({ length: n }, (_, i) => ({
       id: i,
       stage: 'idle', // idle → lock → read → op → write
@@ -100,6 +104,42 @@ function act(st, i, L) {
     return true;
   }
 
+  // Peterson: angkat flag → mengalah (turn) → tunggu giliran → masuk critical section
+  if (st.mechanism === 'peterson' && ['idle', 'flag', 'turn'].includes(p.stage)) {
+    const two = st.n === 2;
+    const lv = st.level[i];
+
+    if (p.stage === 'idle') {
+      st.level[i] = 1;
+      p.stage = 'flag';
+      L(two ? `${nm} set flag[${nm}] = true` : `${nm} set level[${nm}] = 1`);
+      return true;
+    }
+
+    if (p.stage === 'flag') {
+      st.victim[lv] = i;
+      p.stage = 'turn';
+      L(two ? `${nm} set turn = ${nameOf(1 - i)} (mengalah)` : `${nm} set victim[${lv}] = ${nm} (mengalah)`);
+      return true;
+    }
+
+    // stage 'turn': busy waiting selama thread lain ingin masuk dan giliran masih milik thread ini
+    const blocked = st.victim[lv] === i &&
+      st.level.some((x, k) => k !== i && x >= lv);
+    if (blocked) return false;
+
+    if (lv < st.n - 1) {
+      st.level[i] = lv + 1;
+      p.stage = 'flag';
+      L(`${nm} lolos level ${lv}, set level[${nm}] = ${lv + 1}`);
+    } else {
+      st.lock = i;
+      p.stage = 'lock';
+      L(`${nm} masuk critical section`);
+    }
+    return true;
+  }
+
   // Baca nilai shared counter ke variabel lokal
   if (p.stage === 'idle' || p.stage === 'lock') {
     p.local = st.counter;
@@ -124,6 +164,12 @@ function act(st, i, L) {
     if (st.mechanism === 'mutex') {
       st.lock = null;
       L(`${nm} menulis nilai ${p.local}, melepas mutex`);
+    } else if (st.mechanism === 'peterson') {
+      st.level[i] = 0;
+      st.lock = null;
+      L(st.n === 2
+        ? `${nm} menulis nilai ${p.local}, set flag[${nm}] = false`
+        : `${nm} menulis nilai ${p.local}, set level[${nm}] = 0`);
     } else {
       L(`${nm} menulis nilai ${p.local}`);
     }
@@ -181,7 +227,7 @@ function getStatusClass(i) {
   const p = state.th[i];
   if (state.done) return 'done';
   if (i === state.active) {
-    return { lock: 'lock', read: 'running', op: 'op', write: 'write' }[p.stage];
+    return { flag: 'lock', turn: 'lock', lock: 'lock', read: 'running', op: 'op', write: 'write' }[p.stage];
   }
   if (p.stage === 'write') return 'done';
   if (p.stage === 'idle') {
@@ -215,11 +261,15 @@ function render() {
   }
   lastCounter = state.counter;
 
-  if (state.mechanism === 'mutex' && !state.done) {
+  if ((state.mechanism === 'mutex' || state.mechanism === 'peterson') && !state.done) {
     lockChip.hidden = false;
     const locked = state.lock !== null;
     lockChip.className = `badge ${locked ? 'lock' : 'ready'}`;
-    lockChip.textContent = locked ? `Mutex dikunci oleh ${nameOf(state.lock)}` : 'Mutex bebas';
+    if (state.mechanism === 'mutex') {
+      lockChip.textContent = locked ? `Mutex dikunci oleh ${nameOf(state.lock)}` : 'Mutex bebas';
+    } else {
+      lockChip.textContent = locked ? `Critical section: ${nameOf(state.lock)}` : 'Critical section kosong';
+    }  
   } else {
     lockChip.hidden = true;
   }
