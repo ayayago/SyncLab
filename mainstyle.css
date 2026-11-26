@@ -37,17 +37,9 @@ body.sim-body {
   gap: 8px;
 }
 .logo-img {
-  height: 150px;
+  display: block;
+  height: 36px;
   width: auto;
-}
-.logo-mark {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: var(--teal);
-  color: #fff;
 }
 .navbar nav { display: flex; gap: 4px; flex-wrap: wrap; }
 .nav-link {
