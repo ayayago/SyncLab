@@ -47,7 +47,7 @@ function initPhil({ mechanism, n }) {
 function act(st, i, L) {
   const p = st.ph[i];
   const l = i;
-  const r = (i + 1) % st.n;
+  const r = (i + st.n - 1) % st.n;
   const m = st.mechanism;
   const nm = 'P' + (i + 1);
 
