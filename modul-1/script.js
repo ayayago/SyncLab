@@ -219,7 +219,10 @@ function advance(st) {
 function stepRace() {
   if (state.done) return;
   advance(state);
-  if (state.done) stopAutoPlay();
+  if (state.done) {
+    stopAutoPlay();
+    simpanHasilRace(state);
+  }
   render();
 }
 
@@ -309,7 +312,6 @@ function render() {
 }
 
 // Panah antara thread aktif dan shared counter.
-// Membaca: counter → thread. Menulis/lock: thread → counter. Menghitung: garis putus-putus.
 const ARROW_COLOR = {
   lock: '#bcaaa4',
   running: '#a5d6a7',
@@ -328,7 +330,6 @@ function renderArrow() {
   const ar = avatar.getBoundingClientRect();
   const dr = counterDisc.getBoundingClientRect();
 
-  // titik awal: tepi bawah kartu thread (di bawah label Local); titik akhir: tepi atas piringan counter
   const ax = ar.left + ar.width / 2 - vr.left;
   const ay = ar.bottom - vr.top + 2;
   const dcx = dr.left + dr.width / 2 - vr.left;
@@ -340,7 +341,6 @@ function renderArrow() {
   const reading = cls === 'running';
   const computing = cls === 'op';
 
-  // kurva halus dari titik asal ke tujuan
   const [x1, y1, x2, y2] = reading ? [dx, dy, ax, ay] : [ax, ay, dx, dy];
   const cx = (x1 + x2) / 2 + (x2 - x1) * 0.25;
   const cy = (y1 + y2) / 2;
@@ -384,12 +384,105 @@ function resetSimulation() {
   const mechanism = mechSelect.value;
   const n = parseInt(nRange.value, 10);
   const init = readInit();
-  initInput.value = init; // tampilkan nilai yang sudah dirapikan
+  initInput.value = init;
   nVal.textContent = n;
   mechNote.textContent = MECH_NOTE[mechanism];
   state = initRace({ mechanism, n, init, op: opSelect.value });
   lastCounter = null;
   render();
+}
+
+// ==========================================
+// LOGIKA POP-UP PERBANDINGAN RACE CONDITION
+// ==========================================
+const NAMA_MEKANISME_TABEL = {
+  none: 'Tanpa mutex',
+  peterson: "Peterson's algorithm",
+  mutex: 'Mutex'
+};
+
+function simpanHasilRace(st) {
+  const riwayat = JSON.parse(localStorage.getItem('syncLab_race_results')) || {};
+  const expected = expectedValue(st);
+  const terjadiRace = st.counter !== expected;
+
+  // Hitung berapa thread yang tertimpa (lost update)
+  const jumlahRace = terjadiRace ? Math.max(1, st.n - 1) : 0;
+
+  let penilaian = 'Terbaik';
+  let kelasBadge = 'terbaik';
+
+  if (terjadiRace) {
+    penilaian = 'Buruk';
+    kelasBadge = 'buruk';
+  } else if (st.mechanism === 'peterson') {
+    penilaian = 'Baik';
+    kelasBadge = 'baik';
+  }
+
+  riwayat[st.mechanism] = {
+    mekanisme: NAMA_MEKANISME_TABEL[st.mechanism],
+    jumlahProses: st.n,
+    jumlahStep: st.currentStep,
+    nilaiRasio: `${st.counter} / ${expected}`,
+    raceText: `${jumlahRace} kali`,
+    penilaian: penilaian,
+    kelasBadge: kelasBadge
+  };
+
+  localStorage.setItem('syncLab_race_results', JSON.stringify(riwayat));
+}
+
+function bukaModalRace() {
+  renderTabelRace();
+  document.getElementById('modal-race').classList.add('show');
+}
+
+function tutupModalRace() {
+  document.getElementById('modal-race').classList.remove('show');
+}
+
+function tutupModalRaceLuar(e) {
+  if (e.target.id === 'modal-race') tutupModalRace();
+}
+
+function resetRiwayatRace() {
+  localStorage.removeItem('syncLab_race_results');
+  renderTabelRace();
+}
+
+function renderTabelRace() {
+  const saved = JSON.parse(localStorage.getItem('syncLab_race_results')) || {};
+  const daftar = ['none', 'peterson', 'mutex'];
+
+  const tbody = document.getElementById('tabel-hasil-race');
+  if (!tbody) return;
+
+  tbody.innerHTML = daftar.map(key => {
+    const row = saved[key];
+    if (!row) {
+      return `
+        <tr>
+          <td>${NAMA_MEKANISME_TABEL[key]}</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+          <td style="color: #90a4ae;">Belum dijalankan</td>
+          <td>-</td>
+        </tr>
+      `;
+    }
+    return `
+      <tr>
+        <td>${row.mekanisme}</td>
+        <td>${row.jumlahProses}</td>
+        <td>${row.jumlahStep}</td>
+        <td>${row.nilaiRasio}</td>
+        <td>${row.raceText}</td>
+        <td><span class="eval-badge ${row.kelasBadge}">${row.penilaian}</span></td>
+      </tr>
+    `;
+  }).join('');
 }
 
 // Event Listeners
