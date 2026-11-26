@@ -41,9 +41,6 @@ const counterDisc = document.getElementById('counter-disc');
 const threadsLayer = document.getElementById('threads');
 const counterValue = document.getElementById('counter-value');
 const lockChip = document.getElementById('lock-chip');
-const compareBox = document.getElementById('compare');
-const cmpBad = document.getElementById('cmp-bad');
-const cmpGood = document.getElementById('cmp-good');
 const logBox = document.getElementById('log-box');
 const stateList = document.getElementById('state-list');
 const stepCount = document.getElementById('step-count');
@@ -180,13 +177,6 @@ function stepRace() {
   render();
 }
 
-// Jalankan simulasi sampai selesai (untuk kartu perbandingan)
-function runToEnd(base, mechanism) {
-  const st = initRace({ mechanism, n: base.n, init: base.init, op: base.op });
-  while (!st.done) advance(st);
-  return st.counter;
-}
-
 function getStatusClass(i) {
   const p = state.th[i];
   if (state.done) return 'done';
@@ -259,16 +249,12 @@ function render() {
     </div>
   `;
 
-  // 5. Render Perbandingan (hanya saat selesai)
-  compareBox.hidden = !state.done;
-  if (state.done) renderCompare();
-
-  // 6. Update Kontrol
+  // 5. Update Kontrol
   stepCount.textContent = `Step: ${state.currentStep}`;
   btnStep.disabled = state.done;
   btnPlay.disabled = state.done;
 
-  // 7. Panah (dihitung setelah layout selesai)
+  // 6. Panah (dihitung setelah layout selesai)
   requestAnimationFrame(renderArrow);
 }
 
@@ -324,31 +310,6 @@ function renderArrow() {
   arrowLayer.innerHTML =
     `<path d="M${x1},${y1} Q${cx},${cy} ${x2},${y2}" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round"${computing ? ' stroke-dasharray="2 8"' : ''}/>` +
     head;
-}
-
-function renderCompare() {
-  const expected = expectedValue(state);
-  const bad = runToEnd(state, 'none');
-  const good = runToEnd(state, 'mutex');
-  const who = state.n === 2 ? 'Keduanya' : 'Semua thread';
-
-  document.getElementById('cmp-bad-val').textContent = bad;
-  document.getElementById('cmp-good-val').textContent = good;
-
-  const title = document.getElementById('cmp-bad-title');
-  const text = document.getElementById('cmp-bad-text');
-  if (bad !== expected) {
-    title.className = 'badge deadlock';
-    title.textContent = 'Race Condition Terjadi!';
-    text.textContent = `${who} membaca nilai yang sama, sehingga hasil akhir ${bad} (seharusnya ${expected}).`;
-  } else {
-    title.className = 'badge waiting';
-    title.textContent = 'Kebetulan Benar';
-    text.textContent = 'Hasil kebetulan sama karena operasinya tidak mengubah nilai, tetapi tetap tidak aman.';
-  }
-
-  cmpBad.classList.toggle('picked', state.mechanism === 'none');
-  cmpGood.classList.toggle('picked', state.mechanism === 'mutex');
 }
 
 function stopAutoPlay() {

@@ -445,67 +445,6 @@ button:focus-visible {
   color: var(--muted);
 }
 
-/* Perbandingan hasil (saat selesai) */
-.compare {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 16px;
-  width: 100%;
-}
-
-.cmp-card {
-  flex: 1 1 220px;
-  max-width: 300px;
-  padding: 12px 14px;
-  text-align: center;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-top: 4px solid var(--gray);
-  border-radius: 8px;
-}
-
-.cmp-card.bad {
-  border-top-color: var(--red);
-}
-
-.cmp-card.good {
-  border-top-color: var(--green);
-}
-
-.cmp-card.picked {
-  box-shadow: 0 0 0 2px var(--navy);
-}
-
-.cmp-card h4 {
-  margin: 0 0 8px;
-  color: var(--ink);
-}
-
-.cmp-text {
-  margin: 8px 0;
-  font-size: .8rem;
-  color: var(--muted);
-}
-
-.cmp-final {
-  margin: 0;
-  font-size: .85rem;
-  font-weight: 600;
-}
-
-.cmp-final strong {
-  font-size: 1.5rem;
-}
-
-.cmp-card.bad strong {
-  color: var(--red);
-}
-
-.cmp-card.good strong {
-  color: var(--green);
-}
-
 @media (max-width: 960px) {
   .sim-grid {
     grid-template-columns: 1fr;

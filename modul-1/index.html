@@ -23,6 +23,7 @@
           <label class="field-label" for="mech-select">Mekanisme</label>
           <select id="mech-select">
             <option value="none" selected>Tanpa Mutex</option>
+            <option value="peterson">Dengan Peterson Algorithm</option>
             <option value="mutex">Dengan Mutex</option>
           </select>
         </div>
@@ -61,21 +62,6 @@
             </div>
             <div class="counter-label">Shared Counter</div>
             <span class="badge ready" id="lock-chip" hidden></span>
-          </div>
-
-          <div class="compare" id="compare" hidden>
-            <div class="cmp-card bad" id="cmp-bad">
-              <h4>Tanpa Mutex</h4>
-              <span class="badge deadlock" id="cmp-bad-title"></span>
-              <p class="cmp-text" id="cmp-bad-text"></p>
-              <p class="cmp-final">Nilai akhir: <strong id="cmp-bad-val"></strong></p>
-            </div>
-            <div class="cmp-card good" id="cmp-good">
-              <h4>Dengan Mutex</h4>
-              <span class="badge running">Akses Data Aman!</span>
-              <p class="cmp-text">Thread bergantian mengakses data, hasilnya tetap konsisten.</p>
-              <p class="cmp-final">Nilai akhir: <strong id="cmp-good-val"></strong></p>
-            </div>
           </div>
         </div>
       </div>
