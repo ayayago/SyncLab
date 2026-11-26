@@ -8,11 +8,14 @@
 </head>
 <body>
   <div class="container">
-    <div class="sim-head">
+    <div class="sim-head" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
       <div>
         <h1>Race Condition</h1>
         <p>Beberapa thread membaca, menghitung, lalu menulis ke shared counter yang sama.</p>
       </div>
+      <button class="btn-compare" onclick="bukaModalRace()">
+        Lihat Perbandingan
+      </button>
     </div>
 
     <div class="sim-grid">
@@ -95,6 +98,10 @@
     </div>
   </div>
 
-  <script src="script.js"></script>
-</body>
-</html>
+  <!-- Pop-up Modal Perbandingan Race Condition -->
+  <div id="modal-race" class="modal-overlay" onclick="tutupModalRaceLuar(event)">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div>
+          <h2>Perbandingan Race Condition</h2>
+          <p>Hasil simulasi Race Condition pada shared counter</
