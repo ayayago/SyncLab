@@ -63,7 +63,43 @@
       <button class="btn play" id="btn-play">▶ Auto Play</button>
       <button class="btn dark" id="btn-step">Step →</button>
       <button class="btn dark" id="btn-reset">↺ Reset</button>
+      <button class="btn-compare" onclick="bukaModalRW()">Lihat Perbandingan</button>
       <span class="step-count" id="step-count">Step: 0</span>
+    </div>
+  </div>
+
+  <!-- Pop-up Modal Perbandingan Readers-Writers -->
+  <div id="modal-rw" class="modal-overlay" hidden onclick="tutupModalRWLuar(event)">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div>
+          <h2>Perbandingan Readers-Writers</h2>
+          <p>Hasil simulasi kebijakan akses baca dan tulis pada database</p>
+        </div>
+        <button class="btn-close" onclick="tutupModalRW()">✕</button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Mekanisme</th>
+              <th>Jumlah Reader</th>
+              <th>Jumlah Step</th>
+              <th>Risiko Starvation</th>
+              <th>Penilaian</th>
+            </tr>
+          </thead>
+          <tbody id="tabel-hasil-rw">
+            <!-- Diisi otomatis oleh JavaScript -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="resetRiwayatRW()">Reset Data</button>
+        <button class="btn-primary" onclick="tutupModalRW()">Kembali ke Simulasi</button>
+      </div>
     </div>
   </div>
 
