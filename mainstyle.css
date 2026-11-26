@@ -44,7 +44,7 @@ body.sim-body {
   display: flex;
   gap: 8px;
   align-items: center;
-}
+} 
 .logo-img {
   height: 24px;
   width: auto;
