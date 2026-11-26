@@ -30,7 +30,7 @@ body.sim-body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0px 0px;
+  padding: 24px 24px;
   background: var(--white);
   border-bottom: 1px solid var(--line);
   flex-wrap: wrap;
