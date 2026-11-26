@@ -409,15 +409,21 @@ const NAMA_MEKANISME_TABEL = {
 function simpanHasilRace(st) {
   const riwayat = JSON.parse(localStorage.getItem('syncLab_race_results')) || {};
   const expected = expectedValue(st);
-  const terjadiRace = st.counter !== expected || st.mechanism === 'none';
+  const hasilMeleset = st.counter !== expected;
+  const tanpaProteksi = st.mechanism === 'none';
 
   // Hitung berapa thread yang tertimpa (lost update)
-  const jumlahRace = terjadiRace ? Math.max(1, st.n - 1) : 0;
+  const jumlahRace = hasilMeleset ? Math.max(1, st.n - 1) : 0;
 
+  let raceText = `${jumlahRace} kali`;
   let penilaian = 'Terbaik';
   let kelasBadge = 'terbaik';
 
-  if (terjadiRace) {
+  if (hasilMeleset) {
+    penilaian = 'Buruk';
+    kelasBadge = 'buruk';
+  } else if (tanpaProteksi) {
+    raceText = 'Tidak terlihat';
     penilaian = 'Buruk';
     kelasBadge = 'buruk';
   } else if (st.mechanism === 'peterson') {
@@ -430,7 +436,7 @@ function simpanHasilRace(st) {
     jumlahProses: st.n,
     jumlahStep: st.currentStep,
     nilaiRasio: `${st.counter} / ${expected}`,
-    raceText: `${jumlahRace} kali`,
+    raceText: raceText,
     penilaian: penilaian,
     kelasBadge: kelasBadge
   };
