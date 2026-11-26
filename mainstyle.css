@@ -46,10 +46,8 @@ body.sim-body {
   align-items: center;
 }
 .logo-img {
-  width: 32px;
-  height: 32px;
-  object-fit: contain;
-  border-radius: 8px;
+  height: 24px;
+  width: auto;
 }
 .logo-mark {
   display: grid;
