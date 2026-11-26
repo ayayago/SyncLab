@@ -36,17 +36,8 @@ body.sim-body {
   flex-wrap: wrap;
   gap: 8px;
 }
-.logo {
-  text-decoration: none;
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: var(--teal);
-  display: flex;
-  gap: 8px;
-  align-items: center;
-} 
 .logo-img {
-  height: 48px;
+  height: 150px;
   width: auto;
 }
 .logo-mark {
