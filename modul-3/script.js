@@ -47,15 +47,18 @@ function initRW({ policy, readers }) {
       left: 0,
       waitSince: 0,
       finished: false,
-      served: false        // BARU: sudah pernah dilayani
+      served: false
     };
   });
   return {
     policy,
+    readersCount: readers,
     procs,
-    order: Object.fromEntries(queue.map((id, i) => [id, i])),   // BARU: urutan datang (untuk FIFO)
+    order: Object.fromEntries(queue.map((id, i) => [id, i])),
     queue,
     currentStep: 0,
+    hadStarvation: false,
+    starvedTypes: new Set(),
     done: false,
     logs: [`Step 0: Inisialisasi ${readers} reader & 2 writer — ${POLICY_LABEL[policy]}.`]
   };
@@ -68,22 +71,20 @@ function stepRW() {
   const L = (m) => s.logs.push(`Step ${s.currentStep}: ${m}`);
   const all = Object.values(s.procs);
   const active = () => all.filter((p) => p.status === 'active');
-  // UBAH: parameter t boleh kosong (semua jenis), hasil diurutkan menurut urutan datang
   const waiting = (t) => all
     .filter((p) => p.status === 'waiting' && (!t || p.type === t))
     .sort((a, b) => s.order[a.id] - s.order[b.id]);
   const ids = (arr) => arr.map((p) => p.id).join(', ');
   const startRead = (arr) => {
-    arr.forEach((p) => { p.status = 'active'; p.left = READ_TIME; p.served = true; });   // UBAH: served
+    arr.forEach((p) => { p.status = 'active'; p.left = READ_TIME; p.served = true; });
     L(`${ids(arr)} mulai membaca`);
   };
   const startWrite = (p) => {
-    p.status = 'active'; p.left = WRITE_TIME; p.served = true;                          // UBAH: served
+    p.status = 'active'; p.left = WRITE_TIME; p.served = true;
     L(`${p.id} mulai menulis`);
   };
   const wait = (p) => { p.status = 'waiting'; p.waitSince = s.currentStep; L(`${p.id} menunggu`); };
 
-  // Setiap Step: waktu berjalan 1 satuan, lalu TEPAT SATU kejadian dicatat di log.
   active().forEach((p) => p.left--);
 
   // Kejadian 1: proses yang waktunya habis selesai
@@ -102,10 +103,10 @@ function stepRW() {
     if (p.type === 'reader') {
       const blocked = active().some((x) => x.type === 'writer') ||
         (s.policy === 'writer' && waiting('writer').length > 0) ||
-        (s.policy === 'fifo' && waiting().length > 0);                 // BARU: FIFO tidak boleh menyalip antrean
+        (s.policy === 'fifo' && waiting().length > 0);
       blocked ? wait(p) : startRead([p]);
     } else {
-      const free = active().length === 0 && waiting().length === 0;    // UBAH (artinya sama, lebih ringkas)
+      const free = active().length === 0 && waiting().length === 0;
       free ? startWrite(p) : wait(p);
     }
     return true;
@@ -120,29 +121,34 @@ function stepRW() {
     if (s.policy === 'reader') {
       if (wr.length) { startRead(wr); return true; }
       if (none && wt.length) { startWrite(wt[0]); return true; }
-    } else if (s.policy === 'fifo') {                                  // BARU: layani sesuai urutan datang
+    } else if (s.policy === 'fifo') {
       const q = waiting();
       if (!q.length) return false;
       if (q[0].type === 'writer') {
         if (none) { startWrite(q[0]); return true; }
         return false;
       }
-      const batch = [];                                                // reader berurutan di depan antrean masuk bersama
+      const batch = [];
       for (const x of q) { if (x.type === 'reader') batch.push(x); else break; }
       startRead(batch);
       return true;
-    } else if (none) {                                                 // writer-preference
+    } else if (none) {
       if (wt.length) { startWrite(wt[0]); return true; }
       if (wr.length) { startRead(wr); return true; }
     }
     return false;
   };
 
-  // Urutan prioritas = inti kebijakan:
-  // reader-preference: reader yang datang didahulukan sebelum writer yang antre.
-  // writer-preference & FIFO: yang antre didahulukan sebelum proses yang baru datang.
   const order = s.policy === 'reader' ? [finish, arrive, admit] : [finish, admit, arrive];
   const eventHappened = order.some((fn) => fn());
+
+  // Catat jika terjadi indikasi starvation selama langkah berjalan
+  const overtakenNow = all.filter((w) => w.status === 'waiting' &&
+    all.some((x) => x.served && s.order[x.id] > s.order[w.id]));
+  if (overtakenNow.length > 0) {
+    s.hadStarvation = true;
+    overtakenNow.forEach((p) => s.starvedTypes.add(p.type === 'writer' ? 'Writer' : 'Reader'));
+  }
 
   const totalOf = (p) => (p.type === 'reader' ? READ_TIME : WRITE_TIME);
   const progress = (p) => `${p.id} sedang ${p.type === 'reader' ? 'membaca' : 'menulis'} (${totalOf(p) - p.left}/${totalOf(p)})`;
@@ -150,7 +156,7 @@ function stepRW() {
   if (!eventHappened) {
     L(running.length ? running.map(progress).join(', ') : 'tidak ada perubahan');
   } else if (running.length) {
-    s.logs[s.logs.length - 1] += ' · ' + running.map(progress).join(', ');   // tempel di baris Step yang sama
+    s.logs[s.logs.length - 1] += ' · ' + running.map(progress).join(', ');
   }
 
   if (!s.queue.length && all.every((p) => p.status === 'idle')) {
@@ -158,9 +164,13 @@ function stepRW() {
     s.logs.push('Selesai. Semua reader dan writer sudah mengakses database ✓');
   }
 
-  if (s.done) stopAutoPlay();
+  if (s.done) {
+    stopAutoPlay();
+    simpanHasilRW(s);
+  }
   render();
 }
+
 function getStatusClass(p) {
   if (p.status === 'active') return 'running';
   if (p.status === 'waiting') return 'waiting';
@@ -169,7 +179,7 @@ function getStatusClass(p) {
 }
 
 function getStatusLabel(p) {
-    if (p.status === 'active') {                                         
+  if (p.status === 'active') {
     const total = p.type === 'reader' ? READ_TIME : WRITE_TIME;
     return `${p.type === 'reader' ? 'Membaca' : 'Menulis'} (${total - p.left}/${total})`;
   }
@@ -183,7 +193,6 @@ function render() {
   const readers = list.filter((p) => p.type === 'reader');
   const writers = list.filter((p) => p.type === 'writer');
 
-  // posisi node: reader di kiri, writer di kanan
   const place = (arr, x) => arr.map((p, i) => ({
     p, x, y: arr.length === 1 ? 50 : 24 + (i * 52) / (arr.length - 1)
   }));
@@ -196,7 +205,6 @@ function render() {
     : actR.length ? `dibaca oleh ${actR.map((p) => p.id).join(', ')}` : 'kosong';
   const dbClass = actW.length ? 'writing' : actR.length ? 'reading' : '';
 
-  // BARU: antrean FIFO (proses yang menunggu, urut kedatangan)
   const queueList = list
     .filter((p) => p.status === 'waiting')
     .sort((a, b) => state.order[a.id] - state.order[b.id]);
@@ -239,7 +247,6 @@ function render() {
   const longest = list
     .filter((p) => p.status === 'waiting')
     .reduce((m, p) => Math.max(m, state.currentStep - p.waitSince), 0);
-  // UBAH: starvation = ada proses menunggu yang DILEWATI proses yang datang lebih belakangan
   const overtaken = list.filter((w) => w.status === 'waiting' &&
     list.some((x) => x.served && state.order[x.id] > state.order[w.id]));
   const starving = overtaken.length > 0;
@@ -288,6 +295,92 @@ function resetSimulation() {
   policyNote.textContent = POLICY_NOTE[policy];
   state = initRW({ policy, readers });
   render();
+}
+
+// ==========================================
+// LOGIKA POP-UP PERBANDINGAN READERS-WRITERS
+// ==========================================
+function simpanHasilRW(st) {
+  const riwayat = JSON.parse(localStorage.getItem('syncLab_rw_results')) || {};
+
+  let risikoText = 'Tidak ada';
+  let penilaian = 'Terbaik';
+  let kelasBadge = 'terbaik';
+
+  if (st.hadStarvation) {
+    const pihak = Array.from(st.starvedTypes).join(' & ');
+    risikoText = `Starvation (${pihak})`;
+    penilaian = st.policy === 'reader' ? 'Buruk' : 'Cukup';
+    kelasBadge = st.policy === 'reader' ? 'buruk' : 'cukup';
+  } else if (st.policy !== 'fifo') {
+    penilaian = 'Baik';
+    kelasBadge = 'baik';
+  }
+
+  riwayat[st.policy] = {
+    mekanisme: POLICY_LABEL[st.policy],
+    jumlahReader: `${st.readersCount} reader (2 writer)`,
+    jumlahStep: st.currentStep,
+    risiko: risikoText,
+    penilaian: penilaian,
+    kelasBadge: kelasBadge
+  };
+
+  localStorage.setItem('syncLab_rw_results', JSON.stringify(riwayat));
+}
+
+function bukaModalRW() {
+  renderTabelRW();
+  const modal = document.getElementById('modal-rw');
+  modal.hidden = false;
+  modal.classList.add('show');
+}
+
+function tutupModalRW() {
+  const modal = document.getElementById('modal-rw');
+  modal.classList.remove('show');
+  modal.hidden = true;
+}
+
+function tutupModalRWLuar(e) {
+  if (e.target.id === 'modal-rw') tutupModalRW();
+}
+
+function resetRiwayatRW() {
+  localStorage.removeItem('syncLab_rw_results');
+  renderTabelRW();
+}
+
+function renderTabelRW() {
+  const saved = JSON.parse(localStorage.getItem('syncLab_rw_results')) || {};
+  const daftar = ['reader', 'writer', 'fifo'];
+
+  const tbody = document.getElementById('tabel-hasil-rw');
+  if (!tbody) return;
+
+  tbody.innerHTML = daftar.map(key => {
+    const row = saved[key];
+    if (!row) {
+      return `
+        <tr>
+          <td>${POLICY_LABEL[key]}</td>
+          <td>-</td>
+          <td>-</td>
+          <td style="color: #90a4ae;">Belum dijalankan</td>
+          <td>-</td>
+        </tr>
+      `;
+    }
+    return `
+      <tr>
+        <td>${row.mekanisme}</td>
+        <td>${row.jumlahReader}</td>
+        <td>${row.jumlahStep}</td>
+        <td>${row.risiko}</td>
+        <td><span class="eval-badge ${row.kelasBadge}">${row.penilaian}</span></td>
+      </tr>
+    `;
+  }).join('');
 }
 
 // Event Listeners
