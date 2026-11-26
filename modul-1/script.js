@@ -260,7 +260,7 @@ function render() {
 
   // 2. Render Shared Counter
   counterValue.textContent = state.counter;
-  counterValue.parentElement.classList.toggle('long', String(state.counter).length >= 5);
+  counterValue.parentElement.classList.toggle('long', String(state.counter).length >= 4);
   if (lastCounter !== null && lastCounter !== state.counter) {
     counterValue.classList.remove('bump');
     void counterValue.offsetWidth; // restart animasi
@@ -409,7 +409,7 @@ const NAMA_MEKANISME_TABEL = {
 function simpanHasilRace(st) {
   const riwayat = JSON.parse(localStorage.getItem('syncLab_race_results')) || {};
   const expected = expectedValue(st);
-  const terjadiRace = st.counter !== expected;
+  const terjadiRace = st.counter !== expected || st.mechanism === 'none';
 
   // Hitung berapa thread yang tertimpa (lost update)
   const jumlahRace = terjadiRace ? Math.max(1, st.n - 1) : 0;
