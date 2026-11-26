@@ -14,7 +14,7 @@
         <p>Beberapa thread membaca, menghitung, lalu menulis ke shared counter yang sama.</p>
       </div>
       <button class="btn-compare" onclick="bukaModalRace()">
-        Lihat Perbandingan
+        📊 Lihat Perbandingan
       </button>
     </div>
 
@@ -104,4 +104,36 @@
       <div class="modal-header">
         <div>
           <h2>Perbandingan Race Condition</h2>
-          <p>Hasil simulasi Race Condition pada shared counter</
+          <p>Hasil simulasi Race Condition pada shared counter</p>
+        </div>
+        <button class="btn-close" onclick="tutupModalRace()">✕</button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Mekanisme</th>
+              <th>Jumlah Proses</th>
+              <th>Jumlah Step</th>
+              <th>Nilai Akhir / Ekspektasi</th>
+              <th>Race Condition</th>
+              <th>Penilaian</th>
+            </tr>
+          </thead>
+          <tbody id="tabel-hasil-race">
+            <!-- Diisi otomatis oleh JavaScript -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="resetRiwayatRace()">Reset Data</button>
+        <button class="btn-primary" onclick="tutupModalRace()">Kembali ke Simulasi</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
