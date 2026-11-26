@@ -122,11 +122,6 @@ small {
   overflow: visible;
 }
 
-.stage {
-  position: relative;
-  z-index: 1;
-}
-
 /* Form Controls */
 .field {
   display: flex;
@@ -288,10 +283,6 @@ button:focus-visible {
   background: var(--wood);
 }
 
-.badge.deadlock {
-  background: var(--red);
-}
-
 .badge.done {
   background: var(--navy);
 }
@@ -331,6 +322,7 @@ button:focus-visible {
 
 .waiting .avatar {
   background: var(--yellow);
+  color: #3e2723;
   box-shadow: 0 0 0 3px #ffe082;
 }
 
@@ -345,6 +337,8 @@ button:focus-visible {
 
 /* Race Condition Visualization */
 .stage {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -356,13 +350,13 @@ button:focus-visible {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 36px;
+  gap: clamp(12px, 3vw, 36px);
   margin-bottom: 40px;
 }
 
 .thread {
   text-align: center;
-  min-width: 80px;
+  min-width: 64px;
   transition: all .3s;
 }
 
@@ -423,6 +417,10 @@ button:focus-visible {
 
 .plate span.bump {
   animation: bump .35s ease;
+}
+
+.plate.long { 
+  font-size: 1.45rem; 
 }
 
 @keyframes bump {
@@ -602,6 +600,27 @@ button:focus-visible {
 
   .step-count {
     margin-left: 0;
+  }
+}
+
+@media (max-width: 520px) {
+  .threads {
+    gap: 10px;
+  }
+
+  .thread {
+    min-width: 54px;
+  }
+
+  .avatar {
+    width: 44px;
+    height: 44px;
+    font-size: .85rem;
+  }
+
+  .btn {
+    padding: 8px 14px;
+    font-size: .88rem;
   }
 }
 

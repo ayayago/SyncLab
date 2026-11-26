@@ -192,6 +192,8 @@ function advance(st) {
     st.active = null;
     if (st.counter !== expected) {
       L(`Selesai. Race condition! Counter = ${st.counter}, seharusnya ${expected}.`);
+    } else if (st.mechanism === 'none') {
+      L('Selesai. Hasil kebetulan sama (0 × 2 = 0), race tidak terlihat. Coba nilai awal ≠ 0.');
     } else {
       L(`Selesai. Counter = ${st.counter}, sesuai harapan ✓`);
     }
@@ -230,11 +232,12 @@ function getStatusClass(i) {
   const p = state.th[i];
   if (state.done) return 'done';
   if (i === state.active) {
-    return { flag: 'lock', turn: 'lock', lock: 'lock', read: 'running', op: 'op', write: 'write' }[p.stage];
+    return { flag: 'waiting', turn: 'waiting', lock: 'lock', read: 'running', op: 'op', write: 'write' }[p.stage];
   }
   if (p.stage === 'write') return 'done';
+  if (state.lock === i) return 'lock';
   if (p.stage === 'idle') {
-    return state.lock !== null && state.lock !== i ? 'waiting' : 'ready';
+    return state.mechanism === 'mutex' && state.lock !== null && state.lock !== i ? 'waiting' : 'ready';
   }
   return 'waiting';
 }
@@ -257,6 +260,7 @@ function render() {
 
   // 2. Render Shared Counter
   counterValue.textContent = state.counter;
+  counterValue.parentElement.classList.toggle('long', String(state.counter).length >= 5);
   if (lastCounter !== null && lastCounter !== state.counter) {
     counterValue.classList.remove('bump');
     void counterValue.offsetWidth; // restart animasi
@@ -337,6 +341,7 @@ function renderArrow() {
   const dy = dr.top - vr.top - 4;
 
   const cls = getStatusClass(state.active);
+  if (cls === 'waiting') return;
   const color = ARROW_COLOR[cls] || '#cfd8dc';
   const reading = cls === 'running';
   const computing = cls === 'op';
