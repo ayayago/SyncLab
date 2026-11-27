@@ -130,7 +130,10 @@ function stepPhil() {
     L(`Selesai. Semua filsuf sudah makan ${MEALS} kali tanpa deadlock ✓`);
   }
 
-  if (state.done) stopAutoPlay();
+  if (state.done) {
+    stopAutoPlay();
+    simpanHasilPhil(state);
+  }
   render();
 }
 
@@ -234,6 +237,97 @@ function resetSimulation() {
   mechNote.textContent = `Mutex mengambil garpu satu per satu sehingga bisa deadlock. Semaphore membatasi ${n - 1} filsuf di meja. Monitor mengambil kedua garpu sekaligus.`;
   state = initPhil({ mechanism, n });
   render();
+}
+
+// ==========================================
+// LOGIKA POP-UP PERBANDINGAN DINING PHILOSOPHERS
+// ==========================================
+const NAMA_MEKANISME_PHIL = {
+  mutex: 'Mutex',
+  semaphore: 'Semaphore',
+  monitor: 'Monitor'
+};
+
+function simpanHasilPhil(st) {
+  const riwayat = JSON.parse(localStorage.getItem('syncLab_phil_results')) || {};
+
+  let statusDeadlock = 'Tidak ada';
+  let penilaian = 'Cukup';
+  let kelasBadge = 'cukup';
+
+  if (st.deadlock) {
+    statusDeadlock = 'Deadlock';
+    penilaian = 'Buruk';
+    kelasBadge = 'buruk';
+  } else if (st.mechanism === 'semaphore') {
+    penilaian = 'Baik';
+    kelasBadge = 'baik';
+  }
+
+  riwayat[st.mechanism] = {
+    mekanisme: NAMA_MEKANISME_PHIL[st.mechanism],
+    jumlahProses: st.n,
+    jumlahStep: st.currentStep,
+    status: statusDeadlock,
+    penilaian: penilaian,
+    kelasBadge: kelasBadge
+  };
+
+  localStorage.setItem('syncLab_phil_results', JSON.stringify(riwayat));
+}
+
+function bukaModalPhil() {
+  renderTabelPhil();
+  const modal = document.getElementById('modal-phil');
+  modal.hidden = false;
+  modal.classList.add('show');
+}
+
+function tutupModalPhil() {
+  const modal = document.getElementById('modal-phil');
+  modal.classList.remove('show');
+  modal.hidden = true;
+}
+
+function tutupModalPhilLuar(e) {
+  if (e.target.id === 'modal-phil') tutupModalPhil();
+}
+
+function resetRiwayatPhil() {
+  localStorage.removeItem('syncLab_phil_results');
+  renderTabelPhil();
+}
+
+function renderTabelPhil() {
+  const saved = JSON.parse(localStorage.getItem('syncLab_phil_results')) || {};
+  const daftar = ['mutex', 'semaphore', 'monitor'];
+
+  const tbody = document.getElementById('tabel-hasil-phil');
+  if (!tbody) return;
+
+  tbody.innerHTML = daftar.map(key => {
+    const row = saved[key];
+    if (!row) {
+      return `
+        <tr>
+          <td>${NAMA_MEKANISME_PHIL[key]}</td>
+          <td>-</td>
+          <td>-</td>
+          <td style="color: #90a4ae;">Belum dijalankan</td>
+          <td>-</td>
+        </tr>
+      `;
+    }
+    return `
+      <tr>
+        <td>${row.mekanisme}</td>
+        <td>${row.jumlahProses}</td>
+        <td>${row.jumlahStep}</td>
+        <td>${row.status}</td>
+        <td><span class="eval-badge ${row.kelasBadge}">${row.penilaian}</span></td>
+      </tr>
+    `;
+  }).join('');
 }
 
 // Event Listeners
