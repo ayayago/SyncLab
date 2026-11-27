@@ -1,48 +1,102 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SyncLab — Beranda</title>
   <link rel="stylesheet" href="mainstyle.css" />
 </head>
+
 <body>
   <header class="navbar">
-  <a href="homepage.html" class="logo-img">
-    <img src="Logo.png" alt="Logo SyncLab" class="logo-img"/>
-  </a>
-  <nav>
-    <a href="homepage.html" class="nav-link active">Beranda</a>
-    <a href="simulasi.html" class="nav-link">Simulasi Modul</a>
-    <a href="perbandingan.html" class="nav-link">Perbandingan</a>
-    <a href="panduan.html" class="nav-link">Panduan</a>
-  </nav>
-</header>
+    <a href="homepage.html" class="logo-img">
+      <img src="Logo.png" alt="Logo SyncLab" class="logo-img" />
+    </a>
+    <nav>
+      <a href="homepage.html" class="nav-link active">Beranda</a>
+      <a href="simulasi.html" class="nav-link">Simulasi Modul</a>
+      <a href="perbandingan.html" class="nav-link">Perbandingan</a>
+      <a href="panduan.html" class="nav-link">Panduan</a>
+    </nav>
+  </header>
 
   <main class="main-content">
     <div class="home-wrap">
-      <h1>Pahami sinkronisasi proses lewat simulasi langkah demi langkah</h1>
-      <p class="subtitle">SyncLab membantu mahasiswa sistem operasi melihat apa yang terjadi di balik mutex, semaphore, dan monitor.</p>
+      <!-- Hero Ringkas -->
+      <section class="home-hero">
+        <h1 class="hero-brand">Sync<span>Lab</span></h1>
+        <p class="hero-tagline">Pahami Sinkronisasi Proses Secara Visual</p>
+        <p class="subtitle">
+          Amati langsung bagaimana proses dan thread saling berebut sumber daya bersama,
+          serta bagaimana <strong>Mutex</strong>, <strong>Peterson</strong>, <strong>Semaphore</strong>,
+          dan <strong>Monitor</strong> mencegah <em>race condition</em> maupun <em>deadlock</em>.
+        </p>
+        <div class="hero-actions">
+          <a href="simulasi.html" class="btn-primary">▶ Mulai Simulasi</a>
+          <a href="perbandingan.html" class="btn-sage">Lihat Perbandingan</a>
+        </div>
+      </section>
 
+      <!-- 3 Kartu Modul -->
       <div class="cards">
         <a href="simulasi.html?modul=1" class="card home-card">
+          <span class="mod-label">Modul 01 · Shared Counter</span>
           <h3>Race Condition</h3>
-          <p>Amati lost update pada counter bersama, lalu bandingkan dengan Mutex.</p>
+          <p>Amati <em>lost update</em> saat beberapa thread mengubah counter bersamaan, lalu bandingkan hasilnya dengan
+            Peterson dan Mutex.</p>
+          <div class="mod-chips">
+            <span>Tanpa Mutex</span>
+            <span>Peterson</span>
+            <span>Mutex</span>
+          </div>
+          <span class="mod-link">Buka Simulasi →</span>
         </a>
 
         <a href="simulasi.html?modul=2" class="card home-card">
+          <span class="mod-label">Modul 02 · Shared Forks</span>
           <h3>Dining Philosophers</h3>
-          <p>Coba Mutex, Semaphore, dan Monitor, lalu lihat kapan deadlock muncul.</p>
+          <p>Simulasikan perebutan garpu di meja bundar dan amati kapan <em>deadlock</em> atau <em>starvation</em>
+            terjadi.</p>
+          <div class="mod-chips">
+            <span>Mutex</span>
+            <span>Semaphore</span>
+            <span>Monitor</span>
+          </div>
+          <span class="mod-link">Buka Simulasi →</span>
         </a>
 
         <a href="simulasi.html?modul=3" class="card home-card">
+          <span class="mod-label">Modul 03 · Shared Database</span>
           <h3>Readers-Writers</h3>
-          <p>Bandingkan kebijakan reader-preference dan writer-preference.</p>
+          <p>Bandingkan prioritas pembaca, prioritas penulis, dan antrean adil saat mengakses database bersama.</p>
+          <div class="mod-chips">
+            <span>Reader-Pref</span>
+            <span>Writer-Pref</span>
+            <span>FIFO</span>
+          </div>
+          <span class="mod-link">Buka Simulasi →</span>
         </a>
       </div>
 
-      <a href="perbandingan.html" class="btn-primary">Lihat Perbandingan</a>
+      <!-- Strip Cara Kerja Singkat -->
+      <section class="card home-tips">
+        <div class="tip-item">
+          <span class="tip-num">1</span>
+          <span><strong>Pilih Mekanisme</strong> &amp; atur jumlah proses</span>
+        </div>
+        <div class="tip-item">
+          <span class="tip-num">2</span>
+          <span><strong>Jalankan Step / Auto Play</strong> &amp; pantau log</span>
+        </div>
+        <div class="tip-item">
+          <span class="tip-num">3</span>
+          <span><strong>Bandingkan Hasil</strong> tiap mekanisme</span>
+        </div>
+        <a href="panduan.html" class="tip-guide">Panduan →</a>
+      </section>
     </div>
   </main>
 </body>
+
 </html>
