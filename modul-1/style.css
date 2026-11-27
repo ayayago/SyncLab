@@ -273,6 +273,11 @@ button:focus-visible {
   font-size: .95rem;
 }
 
+.btn.dark {
+  background: var(--reset);  
+  box-shadow: 0 3px 0 var(--reset-dark);
+}
+
 .btn.play {
   background: var(--olive-green);
   box-shadow: 0 3px 0 var(--olive-dark);
