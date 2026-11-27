@@ -12,11 +12,11 @@
   --gray: #90a4ae;
   --green: #43a047;
   --yellow: #ffca28;
-  --blue: #3b82f6;      
-  --orange: #ea580c;    
+  --blue: #3b82f6;
+  --orange: #ea580c;
   --pad: 16px;
   --radius: 10px;
-  --node-size: 62px;    
+  --node-size: 62px;
 }
 
 * {
@@ -260,7 +260,7 @@ button:focus-visible {
 }
 
 .rw-node small {
-  position: absolute;     
+  position: absolute;
   top: 100%;
   left: 50%;
   transform: translateX(-50%);
@@ -310,8 +310,15 @@ button:focus-visible {
 }
 
 @keyframes rw-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(67, 160, 71, .45); }
-  50%      { box-shadow: 0 0 0 7px rgba(67, 160, 71, 0); }
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(67, 160, 71, .45);
+  }
+
+  50% {
+    box-shadow: 0 0 0 7px rgba(67, 160, 71, 0);
+  }
 }
 
 /* Kalau Reader 5 atau 6, lingkaran dikecilkan agar tidak bertumpuk */
@@ -400,7 +407,7 @@ button:focus-visible {
 }
 
 /* Tidak ada starvation */
-.starvation.ok {             
+.starvation.ok {
   border-left-color: var(--green);
   background: #e8f5e9;
   color: #2e7d32;
@@ -523,8 +530,15 @@ button:focus-visible {
 }
 
 @keyframes popIn {
-  from { transform: scale(0.95); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .modal-header {
@@ -663,7 +677,7 @@ button:focus-visible {
   }
 
   .rw-node small {
-    display: none;   
+    display: none;
   }
 
   .rw-db {
