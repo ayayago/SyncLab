@@ -1,19 +1,28 @@
 :root {
   --font: "Segoe UI", Arial, sans-serif;
   --ink: #263238;
-  --bg: #f4f7f8;
+  --bg: #f7f6f2;
   --white: #ffffff;
-  --panel: #f8fafb;
-  --muted: #78909c;
-  --line: #cfd8dc;
-  --teal: #00897b;
+  --panel: #fbf9f5;
+  --muted: #78827d;
+  --line: #e0ddd5;
+  --olive-green: #829c32;
+  --olive-dark: #637823;
+  --step: #f28b55;
+  --step-dark: #c86928;
+  --reset: #a87538;
+  --reset-dark: #7d5423;
+  --sage: #768e78;
+  --deep-olive: #657d35;
+  --db-beige: #f0e9d9;
   --navy: #263b50;
-  --red: #e53935;
-  --gray: #90a4ae;
-  --green: #43a047;
-  --yellow: #ffca28;
-  --blue: #3b82f6;
-  --orange: #ea580c;
+  --red: #d94b3d;
+  --gray: #9aa5a0;
+  --green: #26865b;
+  --yellow: #f5bd42;
+  --blue: #398baa;
+  --orange: #f28b45;
+  --coral: #e87545;
   --pad: 16px;
   --radius: 10px;
   --node-size: 62px;
@@ -38,6 +47,7 @@ body {
 h1 {
   font-size: 1.6rem;
   margin: 0 0 4px;
+  color: var(--ink);
 }
 
 h3 {
@@ -89,11 +99,12 @@ small {
 .sim-grid {
   display: grid;
   grid-template-columns: 270px 1fr 320px;
-  border: 1px solid var(--line);
+  border: 1.5px solid var(--line);
   border-radius: var(--radius) var(--radius) 0 0;
   overflow: hidden;
   min-height: 520px;
   background: var(--white);
+  box-shadow: 0 8px 24px rgba(60, 50, 35, 0.05);
 }
 
 .panel {
@@ -105,11 +116,15 @@ small {
 }
 
 .viz {
-  background: var(--white);
+  background-color: #fffdf9;
+  background-image: radial-gradient(#e5dfd2 1.2px, transparent 1.2px);
+  background-size: 18px 18px;
   padding: var(--pad);
   display: grid;
   place-items: center;
   min-width: 0;
+  border-left: 1px solid var(--line);
+  border-right: 1px solid var(--line);
 }
 
 /* Form (Kebijakan & slider Reader) */
@@ -126,27 +141,33 @@ small {
 }
 
 #readers-val {
-  color: var(--teal);
+  color: var(--olive-green);
   font-weight: 700;
 }
 
 select {
   padding: 8px 10px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #fff;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  background: var(--white);
   font: inherit;
+  transition: border-color .2s, box-shadow .2s;
+}
+
+select:hover {
+  border-color: var(--olive-green);
 }
 
 input[type=range] {
-  accent-color: var(--teal);
+  accent-color: var(--olive-green);
   width: 100%;
+  cursor: pointer;
 }
 
 select:focus-visible,
 input:focus-visible,
 button:focus-visible {
-  outline: 2px solid var(--teal);
+  outline: 2px solid var(--olive-green);
   outline-offset: 2px;
 }
 
@@ -171,35 +192,49 @@ button:focus-visible {
 .rw-line {
   stroke: var(--line);
   stroke-width: 2;
+  stroke-linecap: round;
   fill: none;
-  transition: stroke .3s;
+  transition: stroke .3s, stroke-width .3s;
 }
 
 .rw-line.waiting {
   stroke: var(--yellow);
-  stroke-dasharray: 5 4;
+  stroke-width: 2.5;
+  stroke-dasharray: 6 5;
+  animation: dash-flow 1.2s linear infinite;
+}
+
+@keyframes dash-flow {
+  to {
+    stroke-dashoffset: -22;
+  }
 }
 
 /* Garis aktif */
 .rw-line.running {
-  stroke-width: 3;
+  stroke-width: 3.5;
 }
 
 .rw-line.running[x1="14"] {
   stroke: var(--blue);
+  filter: drop-shadow(0 0 3px rgba(57, 139, 170, 0.45));
 }
 
 .rw-line.running[x1="88"] {
-  stroke: var(--orange);
+  stroke: var(--coral);
+  filter: drop-shadow(0 0 3px rgba(232, 117, 69, 0.45));
 }
 
 /* Tulisan "Reader" dan "Writer" di atas kolom lingkaran */
 .rw-label {
   position: absolute;
-  top: 11%;
+  top: 9%;
   transform: translate(-50%, -50%);
-  font-size: .9rem;
-  font-weight: 600;
+  font-size: .88rem;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
   z-index: 2;
 }
 
@@ -225,31 +260,33 @@ button:focus-visible {
   justify-content: center;
   text-align: center;
   padding: 8px;
-  border: 1.5px solid var(--line);
-  border-radius: 14px;
-  background: #eef2f6;
+  border: 2px solid #d8cfc0;
+  border-radius: 16px;
+  background: var(--db-beige);
   font-weight: 700;
   z-index: 1;
-  transition: background .3s, border-color .3s, box-shadow .3s;
+  transition: transform .3s cubic-bezier(0.34, 1.56, 0.64, 1), background .3s, border-color .3s, box-shadow .3s;
 }
 
 .rw-db small {
   display: block;
-  margin-top: 2px;
+  margin-top: 3px;
   font-size: .75rem;
-  font-weight: 400;
+  font-weight: 500;
 }
 
 .rw-db.reading {
-  background: #dbeafe;
+  background: #e1f0f5;
   border-color: var(--blue);
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, .15);
+  box-shadow: 0 0 0 5px rgba(57, 139, 170, .18);
+  transform: translate(-50%, -50%) scale(1.04);
 }
 
 .rw-db.writing {
-  background: #ffedd5;
-  border-color: var(--orange);
-  box-shadow: 0 0 0 4px rgba(234, 88, 12, .15);
+  background: #fce8df;
+  border-color: var(--coral);
+  box-shadow: 0 0 0 5px rgba(232, 117, 69, .18);
+  transform: translate(-50%, -50%) scale(1.04);
 }
 
 /* Lingkaran proses */
@@ -257,17 +294,27 @@ button:focus-visible {
   position: absolute;
   transform: translate(-50%, -50%);
   z-index: 2;
+  transition: transform .25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.rw-node:hover {
+  transform: translate(-50%, -53%) scale(1.06);
+  z-index: 4;
 }
 
 .rw-node small {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 2px);
   left: 50%;
   transform: translateX(-50%);
-  margin-top: 3px;
-  font-size: .7rem;
+  padding: 0 6px;
+  border-radius: 6px;
+  background: rgba(255, 253, 249, 0.92);
+  font-size: .68rem;
   font-weight: 600;
+  line-height: 1.25;
   white-space: nowrap;
+  pointer-events: none;
 }
 
 .avatar {
@@ -276,15 +323,16 @@ button:focus-visible {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  font-size: clamp(.7rem, calc(var(--node-size) * .26), 1rem);
+  font-size: clamp(.7rem, calc(var(--node-size) * .26), .98rem);
   font-weight: 700;
-  color: #fff;
+  color: var(--white);
   background: var(--gray);
-  border: 3px solid #fff;
-  transition: background .3s, box-shadow .3s, transform .3s;
+  border: 3px solid var(--white);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  transition: background .3s, box-shadow .3s, transform .3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Cincin warna */
+/* Cincin warna & Status Lingkaran */
 .rw-node.reader .avatar {
   border-color: var(--blue);
 }
@@ -293,10 +341,9 @@ button:focus-visible {
   border-color: var(--orange);
 }
 
-/* Warna isi lingkaran */
 .rw-node.running .avatar {
   background: var(--green);
-  transform: scale(1.12);
+  transform: scale(1.08);
   animation: rw-pulse 1.4s ease-in-out infinite;
 }
 
@@ -313,15 +360,15 @@ button:focus-visible {
 
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgba(67, 160, 71, .45);
+    box-shadow: 0 0 0 0 rgba(38, 134, 91, .45);
   }
 
   50% {
-    box-shadow: 0 0 0 7px rgba(67, 160, 71, 0);
+    box-shadow: 0 0 0 7px rgba(38, 134, 91, 0);
   }
 }
 
-/* Kalau Reader 5 atau 6, lingkaran dikecilkan agar tidak bertumpuk */
+/* Perkecil lingkaran jika Reader 5 atau 6 */
 .rw-area:has(.rw-node.reader:nth-child(9)) {
   --node-size: 46px;
 }
@@ -332,9 +379,9 @@ button:focus-visible {
 
 /* Panel kanan: Log & State */
 .log {
-  background: #fff;
+  background: #f4f5e8;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius);
   padding: 8px;
   height: 230px;
   overflow-y: auto;
@@ -343,13 +390,15 @@ button:focus-visible {
 }
 
 .log-line {
-  padding: 3px 4px;
-  border-bottom: 1px dashed #eceff1;
+  padding: 3px 6px;
+  border-bottom: 1px dashed #dcdfd0;
   overflow-wrap: anywhere;
+  transition: background .2s;
 }
 
 .log-line.last {
-  background: #e0f2f1;
+  background: #e5ecc9;
+  border-radius: 6px;
   font-weight: 600;
 }
 
@@ -373,11 +422,11 @@ button:focus-visible {
   font-size: .85rem;
 }
 
-/* Ringkasan */
+/* Ringkasan & Starvation */
 .state-summary {
-  background: #fff;
+  background: var(--white);
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius);
   padding: 6px 12px;
   margin-bottom: 8px;
 }
@@ -391,37 +440,36 @@ button:focus-visible {
 }
 
 .state-summary b {
-  color: var(--teal);
+  color: var(--olive-green);
 }
 
-/* Peringatan starvation */
 .starvation {
   margin-top: 6px;
   padding: 5px 10px;
   border-left: 3px solid var(--red);
-  border-radius: 4px;
-  background: #fdecea;
+  border-radius: 6px;
+  background: #fbe9e7;
   color: var(--red);
   font-size: .82rem;
   font-weight: 700;
 }
 
-/* Tidak ada starvation */
 .starvation.ok {
   border-left-color: var(--green);
-  background: #e8f5e9;
-  color: #2e7d32;
+  background: #e6f4ee;
+  color: var(--green);
 }
 
 /* Badge Status */
 .badge {
   display: inline-block;
   padding: 2px 10px;
-  border-radius: 12px;
+  border-radius: 999px;
   font-size: .75rem;
   font-weight: 600;
-  color: #fff;
+  color: var(--white);
   background: var(--gray);
+  transition: transform .2s, background .2s;
 }
 
 .badge.ready {
@@ -449,7 +497,7 @@ button:focus-visible {
   align-items: center;
   padding: 12px var(--pad);
   background: var(--panel);
-  border: 1px solid var(--line);
+  border: 1.5px solid var(--line);
   border-top: 0;
   border-radius: 0 0 var(--radius) var(--radius);
 }
@@ -463,45 +511,66 @@ button:focus-visible {
 
 .btn {
   border: 0;
-  color: #fff;
+  color: var(--white);
   padding: 10px 22px;
-  border-radius: 8px;
+  border-radius: 999px;
   font-weight: 600;
   font-size: .95rem;
+  transition: transform .15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow .15s, filter .15s;
 }
 
 .btn.play {
-  background: var(--teal);
+  background: var(--olive-green);
+  box-shadow: 0 3px 0 var(--olive-dark);
 }
 
-.btn.dark {
-  background: var(--navy);
+.btn.step {
+  background: var(--step);
+  box-shadow: 0 3px 0 var(--step-dark);
+}
+
+.btn.dark,
+.btn.reset {
+  background: var(--reset);
+  box-shadow: 0 3px 0 var(--reset-dark);
 }
 
 .btn:hover:not(:disabled) {
-  filter: brightness(1.1);
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: none !important;
 }
 
 .btn:disabled {
   opacity: .45;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
-/* ==========================================
-   TOMBOL & POP-UP MODAL READERS-WRITERS
-   ========================================== */
 .btn-compare {
-  background: var(--teal);
+  background: var(--sage);
   color: var(--white);
   border: 0;
   padding: 10px 18px;
-  border-radius: 8px;
+  border-radius: 999px;
   font-weight: 600;
   font-size: .95rem;
+  box-shadow: 0 3px 0 #586b5a;
+  transition: transform .15s, box-shadow .15s, filter .15s;
 }
 
 .btn-compare:hover {
-  filter: brightness(1.08);
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+}
+
+.btn-compare:active {
+  transform: translateY(2px);
+  box-shadow: none;
 }
 
 .modal-overlay {
@@ -520,10 +589,10 @@ button:focus-visible {
 }
 
 .modal-box {
-  background: var(--white);
+  background: var(--bg);
   width: 100%;
   max-width: 920px;
-  border-radius: 12px;
+  border-radius: 16px;
   padding: 24px;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
   animation: popIn .18s ease-out;
@@ -566,20 +635,30 @@ button:focus-visible {
   font-size: 1.2rem;
   color: var(--muted);
   padding: 4px 8px;
+  border-radius: 8px;
+  transition: background .2s, color .2s;
+}
+
+.btn-close:hover {
+  background: var(--red);
+  color: var(--white);
 }
 
 .table-wrap {
   overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--white);
 }
 
 .compare-table {
   width: 100%;
   border-collapse: collapse;
-  border: 1px solid var(--line);
+  background: var(--white);
 }
 
 .compare-table thead tr {
-  background: #0d7367;
+  background: var(--olive-green);
   color: var(--white);
 }
 
@@ -587,7 +666,7 @@ button:focus-visible {
 .compare-table td {
   padding: 14px 12px;
   text-align: center;
-  border-bottom: 1px solid #eceff1;
+  border-bottom: 1px solid #ece9e0;
   font-size: .9rem;
 }
 
@@ -602,19 +681,19 @@ button:focus-visible {
   min-width: 96px;
   text-align: center;
   padding: 5px 12px;
-  border-radius: 4px;
+  border-radius: 999px;
   font-size: .8rem;
   font-weight: 600;
 }
 
 .eval-badge.bahaya {
-  background: #f8d7da;
-  color: #842029;
+  background: #fdeceb;
+  color: var(--red);
 }
 
 .eval-badge.aman {
-  background: #d1e7dd;
-  color: #0f5132;
+  background: #e6f4ee;
+  color: var(--green);
 }
 
 .modal-footer {
@@ -625,21 +704,37 @@ button:focus-visible {
 }
 
 .btn-secondary {
-  background: #eceff1;
-  color: #455a64;
-  border: 0;
-  padding: 9px 16px;
-  border-radius: 8px;
-  font-weight: 600;
-}
-
-.btn-primary {
-  background: var(--navy);
+  background: var(--sage);
   color: var(--white);
   border: 0;
   padding: 9px 18px;
-  border-radius: 8px;
+  border-radius: 999px;
   font-weight: 600;
+  box-shadow: 0 3px 0 #586b5a;
+  transition: transform .15s, box-shadow .15s;
+}
+
+.btn-primary {
+  background: var(--deep-olive);
+  color: var(--white);
+  border: 0;
+  padding: 9px 18px;
+  border-radius: 999px;
+  font-weight: 600;
+  box-shadow: 0 3px 0 #4b5e26;
+  transition: transform .15s, box-shadow .15s;
+}
+
+.btn-secondary:hover,
+.btn-primary:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+}
+
+.btn-secondary:active,
+.btn-primary:active {
+  transform: translateY(2px);
+  box-shadow: none;
 }
 
 /* Responsif */
@@ -647,6 +742,13 @@ button:focus-visible {
   .sim-grid {
     grid-template-columns: 1fr;
     min-height: 0;
+  }
+
+  .viz {
+    border-left: 0;
+    border-right: 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
   }
 
   .log {
@@ -701,7 +803,9 @@ button:focus-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .rw-node.running .avatar {
+
+  .rw-node.running .avatar,
+  .rw-line.waiting {
     animation: none;
   }
 }
@@ -710,7 +814,7 @@ button:focus-visible {
 .rw-queue {
   position: absolute;
   left: 50%;
-  bottom: 0;
+  bottom: 2px;
   transform: translateX(-50%);
   display: flex;
   flex-wrap: wrap;
@@ -719,9 +823,9 @@ button:focus-visible {
   gap: 6px;
   width: max-content;
   max-width: 100%;
-  padding: 6px 14px;
+  padding: 5px 14px;
   background: var(--panel);
-  border: 1px solid var(--line);
+  border: 1.5px solid var(--line);
   border-radius: 999px;
   font-size: .8rem;
   z-index: 2;
@@ -729,7 +833,7 @@ button:focus-visible {
 
 .rw-queue-title {
   font-weight: 700;
-  color: var(--navy);
+  color: var(--reset);
 }
 
 .q-chip {
@@ -737,7 +841,7 @@ button:focus-visible {
   padding: 1px 10px;
   border-radius: 999px;
   border: 2px solid var(--blue);
-  background: #fff;
+  background: var(--white);
   color: var(--blue);
   font-weight: 700;
 }
@@ -747,11 +851,10 @@ button:focus-visible {
   color: var(--orange);
 }
 
-/* proses paling depan = dilayani berikutnya */
 .q-chip.head {
   background: var(--yellow);
   color: #3e2723;
-  box-shadow: 0 0 0 3px rgba(0, 137, 123, .35);
+  box-shadow: 0 0 0 3px rgba(130, 156, 50, .35);
 }
 
 .q-arrow,
