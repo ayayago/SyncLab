@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dining Philosophers Simulator</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=2" />
 </head>
 <body>
   <div class="container">
@@ -70,10 +70,46 @@
       <button class="btn play" id="btn-play">▶ Auto Play</button>
       <button class="btn dark" id="btn-step">Step →</button>
       <button class="btn dark" id="btn-reset">↺ Reset</button>
+      <button class="btn-compare" onclick="bukaModalPhil()">Lihat Perbandingan</button>
       <span class="step-count" id="step-count">Step: 0</span>
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <!-- Pop-up Modal Perbandingan Dining Philosophers -->
+  <div id="modal-phil" class="modal-overlay" hidden onclick="tutupModalPhilLuar(event)">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div>
+          <h2>Perbandingan Dining Philosophers</h2>
+          <p>Hasil simulasi Dining Philosophers</p>
+        </div>
+        <button class="btn-close" onclick="tutupModalPhil()">✕</button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Mekanisme</th>
+              <th>Jumlah Proses</th>
+              <th>Jumlah Step</th>
+              <th>Deadlock/Starvation</th>
+              <th>Penilaian</th>
+            </tr>
+          </thead>
+          <tbody id="tabel-hasil-phil">
+            <!-- Diisi otomatis oleh JavaScript -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="resetRiwayatPhil()">Reset Data</button>
+        <button class="btn-primary" onclick="tutupModalPhil()">Kembali ke Simulasi</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js?v=2"></script>
 </body>
 </html>

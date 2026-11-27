@@ -30,6 +30,8 @@ function initPhil({ mechanism, n }) {
     currentStep: 0,
     done: false,
     deadlock: false,
+    starvation: false,
+    starvedPhils: new Set(),
     room: n - 1,
     forks: Array(n).fill(null),
     ph: Array.from({ length: n }, (_, i) => ({
@@ -38,7 +40,8 @@ function initPhil({ mechanism, n }) {
       left: false,
       right: false,
       seat: false,
-      meals: 0
+      meals: 0,
+      hungrySince: 0
     })),
     logs: [`Step 0: Inisialisasi ${n} filsuf — ${MECH_LABEL[mechanism]}.`],
   };
@@ -54,6 +57,7 @@ function act(st, i, L) {
   if (p.state === 'done') return false;
   if (p.state === 'thinking') {
     p.state = 'hungry';
+    p.hungrySince = st.currentStep;
     L(`${nm} lapar`);
     return true;
   }
@@ -125,12 +129,33 @@ function stepPhil() {
     state.deadlock = true;
     state.done = true;
     L('DEADLOCK! Semua filsuf menunggu garpu satu sama lain.');
-  } else if (state.ph.every((p) => p.state === 'done')) {
-    state.done = true;
-    L(`Selesai. Semua filsuf sudah makan ${MEALS} kali tanpa deadlock ✓`);
+  } else {
+    // Cek indikasi starvation: filsuf lapar menunggu >= n * 3 langkah tanpa makan
+    const batasTunggu = state.n * 3;
+    state.ph.forEach((p, idx) => {
+      if (p.state === 'hungry' && (state.currentStep - p.hungrySince) >= batasTunggu) {
+        const nama = 'P' + (idx + 1);
+        if (!state.starvedPhils.has(nama)) {
+          state.starvedPhils.add(nama);
+          state.starvation = true;
+          L(`Indikasi STARVATION pada ${nama} (menunggu ${state.currentStep - p.hungrySince} langkah).`);
+        }
+      }
+    });
+
+    if (state.ph.every((p) => p.state === 'done')) {
+      state.done = true;
+      const catatan = state.starvation
+        ? `dengan indikasi starvation (${Array.from(state.starvedPhils).join(', ')})`
+        : 'tanpa deadlock maupun starvation ✓';
+      L(`Selesai. Semua filsuf sudah makan ${MEALS} kali ${catatan}`);
+    }
   }
 
-  if (state.done) stopAutoPlay();
+  if (state.done) {
+    stopAutoPlay();
+    simpanHasilPhil(state);
+  }
   render();
 }
 
@@ -186,7 +211,7 @@ function render() {
   // 3. Render Log
   logBox.innerHTML = state.logs.map((line, idx) => {
     const isLast = idx === state.logs.length - 1;
-    const isBad = line.includes('DEADLOCK');
+    const isBad = line.includes('DEADLOCK') || line.includes('STARVATION');
     return `<div class="log-line ${isLast ? 'last' : ''} ${isBad ? 'bad' : ''}">${line}</div>`;
   }).join('');
   logBox.scrollTop = logBox.scrollHeight;
@@ -234,6 +259,102 @@ function resetSimulation() {
   mechNote.textContent = `Mutex mengambil garpu satu per satu sehingga bisa deadlock. Semaphore membatasi ${n - 1} filsuf di meja. Monitor mengambil kedua garpu sekaligus.`;
   state = initPhil({ mechanism, n });
   render();
+}
+
+// ==========================================
+// LOGIKA POP-UP PERBANDINGAN DINING PHILOSOPHERS
+// ==========================================
+const NAMA_MEKANISME_PHIL = {
+  mutex: 'Mutex',
+  semaphore: 'Semaphore',
+  monitor: 'Monitor'
+};
+
+function simpanHasilPhil(st) {
+  const riwayat = JSON.parse(localStorage.getItem('syncLab_phil_results')) || {};
+
+  let statusMasalah = 'Tidak ada';
+  let penilaian = 'Terbaik';
+  let kelasBadge = 'terbaik';
+
+  if (st.deadlock) {
+    statusMasalah = 'Deadlock';
+    penilaian = 'Buruk';
+    kelasBadge = 'buruk';
+  } else if (st.starvation) {
+    const daftarStarved = Array.from(st.starvedPhils).join(', ');
+    statusMasalah = `Starvation (${daftarStarved})`;
+    penilaian = 'Cukup';
+    kelasBadge = 'cukup';
+  } else if (st.mechanism === 'semaphore') {
+    penilaian = 'Cukup';
+    kelasBadge = 'cukup';
+  }
+
+  riwayat[st.mechanism] = {
+    mekanisme: NAMA_MEKANISME_PHIL[st.mechanism],
+    jumlahProses: st.n,
+    jumlahStep: st.currentStep,
+    status: statusMasalah,
+    penilaian: penilaian,
+    kelasBadge: kelasBadge
+  };
+
+  localStorage.setItem('syncLab_phil_results', JSON.stringify(riwayat));
+}
+
+function bukaModalPhil() {
+  renderTabelPhil();
+  const modal = document.getElementById('modal-phil');
+  modal.hidden = false;
+  modal.classList.add('show');
+}
+
+function tutupModalPhil() {
+  const modal = document.getElementById('modal-phil');
+  modal.classList.remove('show');
+  modal.hidden = true;
+}
+
+function tutupModalPhilLuar(e) {
+  if (e.target.id === 'modal-phil') tutupModalPhil();
+}
+
+function resetRiwayatPhil() {
+  localStorage.removeItem('syncLab_phil_results');
+  renderTabelPhil();
+}
+
+function renderTabelPhil() {
+  const saved = JSON.parse(localStorage.getItem('syncLab_phil_results')) || {};
+  const daftar = ['mutex', 'semaphore', 'monitor'];
+
+  const tbody = document.getElementById('tabel-hasil-phil');
+  if (!tbody) return;
+
+  tbody.innerHTML = daftar.map(key => {
+    const row = saved[key];
+    if (!row) {
+      return `
+        <tr>
+          <td>${NAMA_MEKANISME_PHIL[key]}</td>
+          <td>-</td>
+          <td>-</td>
+          <td style="color: #90a4ae;">Belum dijalankan</td>
+          <td>-</td>
+        </tr>
+      `;
+    }
+    return `
+      <tr>
+        <td>${row.mekanisme}</td>
+        <td>${row.jumlahProses}</td>
+        <td>${row.jumlahStep}</td>
+        <td>${row.status}</td>
+        <td><span class="eval-badge ${row.kelasBadge}">${row.penilaian}</span></td>
+      </tr>
+    `;
+  }).join('');
 }
 
 // Event Listeners
