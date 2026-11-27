@@ -71,7 +71,7 @@ body.sim-body {
 
 .nav-link:hover {
   background: #efeae0;
-  color: var(--olive-dark)
+  color: var(--olive-dark);
 }
 
 .nav-link.active {
@@ -87,19 +87,62 @@ body.sim-body {
 }
 
 .home-wrap {
-  max-width: 920px;
+  max-width: 960px;
   margin: 12px auto;
 }
 
 .home-wrap h1 {
   font-size: 1.75rem;
   margin: 0 0 8px;
-  color: var(--ink)
+  color: var(--ink);
 }
 
 .subtitle {
   color: var(--muted);
-  margin: 0 0 26px;
+  margin: 0 0 22px;
+}
+
+/* Hero Beranda Ringkas */
+.home-hero {
+  background-color: #fffdf9;
+  background-image: radial-gradient(#e5dfd2 1.2px, transparent 1.2px);
+  background-size: 18px 18px;
+  border: 1.5px solid var(--line);
+  border-radius: 16px;
+  padding: 28px 28px 26px;
+  margin-bottom: 22px;
+  box-shadow: 0 6px 18px rgba(60, 50, 35, 0.04);
+}
+
+.home-hero .hero-brand {
+  font-size: clamp(2.1rem, 4vw, 2.75rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 0 0 6px;
+  color: var(--ink);
+}
+
+.home-hero .hero-brand span {
+  color: var(--olive-green);
+}
+
+.hero-tagline {
+  font-size: 1.18rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 10px;
+}
+
+.home-hero .subtitle {
+  max-width: 720px;
+  font-size: 0.96rem;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 /* Kartu Beranda */
@@ -107,7 +150,7 @@ body.sim-body {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 18px;
-  margin-bottom: 28px;
+  margin-bottom: 22px;
 }
 
 .card {
@@ -119,7 +162,8 @@ body.sim-body {
 }
 
 .home-card {
-  display: block;
+  display: flex;
+  flex-direction: column;
   text-decoration: none;
   color: inherit;
   border-top: 4px solid var(--olive-green);
@@ -135,9 +179,15 @@ body.sim-body {
 }
 
 .home-card:hover {
-  border-color: var(--olive-green);
   transform: translateY(-4px);
   box-shadow: 0 12px 24px rgba(60, 50, 35, 0.09);
+}
+
+.mod-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 6px;
 }
 
 .home-card h3 {
@@ -147,30 +197,117 @@ body.sim-body {
 }
 
 .home-card p {
-  margin: 0;
+  margin: 0 0 14px;
   color: var(--muted);
   font-size: 0.9rem;
+  flex: 1;
 }
 
-.btn-primary {
+.mod-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.mod-chips span {
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  color: var(--ink);
+}
+
+.mod-link {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--olive-dark);
+}
+
+.home-card:nth-child(2) .mod-link {
+  color: #c86928;
+}
+
+.home-card:nth-child(3) .mod-link {
+  color: var(--reset);
+}
+
+/* Strip Tips Singkat */
+.home-tips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px 20px;
+  background: var(--panel);
+}
+
+.tip-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.86rem;
+  color: var(--ink);
+}
+
+.tip-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--olive-green);
+  color: var(--white);
+  font-size: 0.78rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.tip-guide {
+  text-decoration: none;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--olive-dark);
+}
+
+.tip-guide:hover {
+  text-decoration: underline;
+}
+
+/* Tombol */
+.btn-primary,
+.btn-sage {
   display: inline-block;
   text-decoration: none;
-  background: var(--olive-green);
   color: var(--white);
   padding: 11px 24px;
   border-radius: 999px;
   font-weight: 600;
   font-size: 0.95rem;
-  box-shadow: 0 3px 0 var(--olive-dark);
   transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s, filter 0.15s;
 }
 
-.btn-primary:hover {
+.btn-primary {
+  background: var(--olive-green);
+  box-shadow: 0 3px 0 var(--olive-dark);
+}
+
+.btn-sage {
+  background: var(--sage);
+  box-shadow: 0 3px 0 #586b5a;
+}
+
+.btn-primary:hover,
+.btn-sage:hover {
   transform: translateY(-2px);
   filter: brightness(1.06);
 }
 
-.btn-primary:active {
+.btn-primary:active,
+.btn-sage:active {
   transform: translateY(2px);
   box-shadow: none;
 }
