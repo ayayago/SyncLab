@@ -1,3 +1,4 @@
+/* 1. VARIABEL WARNA & UKURAN GLOBAL */
 :root {
   --font: "Segoe UI", Arial, sans-serif;
   --ink: #263238;
@@ -28,6 +29,7 @@
   --node-size: 62px;
 }
 
+/* 2. RESET & ELEMEN DASAR */
 * {
   box-sizing: border-box;
 }
@@ -57,7 +59,7 @@ h3 {
 
 h4 {
   margin: 14px 0 8px;
-  font-size: .9rem;
+  font-size: 0.9rem;
   color: var(--muted);
 }
 
@@ -72,7 +74,7 @@ small {
 }
 
 .note {
-  font-size: .82rem;
+  font-size: 0.82rem;
 }
 
 .container {
@@ -81,7 +83,7 @@ small {
   padding: var(--pad);
 }
 
-/* Header & Grid 3 Kolom */
+/* 3. HEADER & GRID 3 KOLOM */
 .sim-head {
   display: flex;
   justify-content: space-between;
@@ -127,7 +129,7 @@ small {
   border-right: 1px solid var(--line);
 }
 
-/* Form (Kebijakan & slider Reader) */
+/* 4. PANEL KIRI: FORM PARAMETER & SLIDER */
 .field {
   display: flex;
   flex-direction: column;
@@ -136,7 +138,7 @@ small {
 }
 
 .field-label {
-  font-size: .85rem;
+  font-size: 0.85rem;
   font-weight: 600;
 }
 
@@ -151,14 +153,14 @@ select {
   border-radius: 10px;
   background: var(--white);
   font: inherit;
-  transition: border-color .2s, box-shadow .2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 select:hover {
   border-color: var(--olive-green);
 }
 
-input[type=range] {
+input[type="range"] {
   accent-color: var(--olive-green);
   width: 100%;
   cursor: pointer;
@@ -171,14 +173,13 @@ button:focus-visible {
   outline-offset: 2px;
 }
 
-/* Visualisasi Readers-Writers */
+/* 5. PANEL TENGAH: GARIS & KOTAK DATABASE */
 .rw-area {
   position: relative;
   width: min(100%, 700px);
   aspect-ratio: 1.15 / 1;
 }
 
-/* Garis penghubung berada paling bawah */
 .rw-lines {
   position: absolute;
   inset: 0;
@@ -194,7 +195,7 @@ button:focus-visible {
   stroke-width: 2;
   stroke-linecap: round;
   fill: none;
-  transition: stroke .3s, stroke-width .3s;
+  transition: stroke 0.3s, stroke-width 0.3s;
 }
 
 .rw-line.waiting {
@@ -210,7 +211,6 @@ button:focus-visible {
   }
 }
 
-/* Garis aktif */
 .rw-line.running {
   stroke-width: 3.5;
 }
@@ -225,12 +225,11 @@ button:focus-visible {
   filter: drop-shadow(0 0 3px rgba(232, 117, 69, 0.45));
 }
 
-/* Tulisan "Reader" dan "Writer" di atas kolom lingkaran */
 .rw-label {
   position: absolute;
   top: 9%;
   transform: translate(-50%, -50%);
-  font-size: .88rem;
+  font-size: 0.88rem;
   font-weight: 700;
   padding: 2px 10px;
   border-radius: 999px;
@@ -246,7 +245,6 @@ button:focus-visible {
   color: var(--orange);
 }
 
-/* Kotak Database di tengah */
 .rw-db {
   position: absolute;
   left: 50%;
@@ -265,36 +263,36 @@ button:focus-visible {
   background: var(--db-beige);
   font-weight: 700;
   z-index: 1;
-  transition: transform .3s cubic-bezier(0.34, 1.56, 0.64, 1), background .3s, border-color .3s, box-shadow .3s;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s, border-color 0.3s, box-shadow 0.3s;
 }
 
 .rw-db small {
   display: block;
   margin-top: 3px;
-  font-size: .75rem;
+  font-size: 0.75rem;
   font-weight: 500;
 }
 
 .rw-db.reading {
   background: #e1f0f5;
   border-color: var(--blue);
-  box-shadow: 0 0 0 5px rgba(57, 139, 170, .18);
+  box-shadow: 0 0 0 5px rgba(57, 139, 170, 0.18);
   transform: translate(-50%, -50%) scale(1.04);
 }
 
 .rw-db.writing {
   background: #fce8df;
   border-color: var(--coral);
-  box-shadow: 0 0 0 5px rgba(232, 117, 69, .18);
+  box-shadow: 0 0 0 5px rgba(232, 117, 69, 0.18);
   transform: translate(-50%, -50%) scale(1.04);
 }
 
-/* Lingkaran proses */
+/* 6. LINGKARAN PROSES (READER & WRITER) */
 .rw-node {
   position: absolute;
   transform: translate(-50%, -50%);
   z-index: 2;
-  transition: transform .25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .rw-node:hover {
@@ -310,7 +308,7 @@ button:focus-visible {
   padding: 0 6px;
   border-radius: 6px;
   background: rgba(255, 253, 249, 0.92);
-  font-size: .68rem;
+  font-size: 0.68rem;
   font-weight: 600;
   line-height: 1.25;
   white-space: nowrap;
@@ -323,16 +321,15 @@ button:focus-visible {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  font-size: clamp(.7rem, calc(var(--node-size) * .26), .98rem);
+  font-size: clamp(0.7rem, calc(var(--node-size) * 0.26), 0.98rem);
   font-weight: 700;
   color: var(--white);
   background: var(--gray);
   border: 3px solid var(--white);
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-  transition: background .3s, box-shadow .3s, transform .3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: background 0.3s, box-shadow 0.3s, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Cincin warna & Status Lingkaran */
 .rw-node.reader .avatar {
   border-color: var(--blue);
 }
@@ -360,7 +357,7 @@ button:focus-visible {
 
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgba(38, 134, 91, .45);
+    box-shadow: 0 0 0 0 rgba(38, 134, 91, 0.45);
   }
 
   50% {
@@ -368,7 +365,6 @@ button:focus-visible {
   }
 }
 
-/* Perkecil lingkaran jika Reader 5 atau 6 */
 .rw-area:has(.rw-node.reader:nth-child(9)) {
   --node-size: 46px;
 }
@@ -377,7 +373,7 @@ button:focus-visible {
   --node-size: 40px;
 }
 
-/* Panel kanan: Log & State */
+/* 7. PANEL KANAN: LOG, RINGKASAN & BADGE STATUS */
 .log {
   background: #f4f5e8;
   border: 1px solid var(--line);
@@ -385,7 +381,7 @@ button:focus-visible {
   padding: 8px;
   height: 230px;
   overflow-y: auto;
-  font-size: .8rem;
+  font-size: 0.8rem;
   font-family: ui-monospace, Menlo, monospace;
 }
 
@@ -393,7 +389,7 @@ button:focus-visible {
   padding: 3px 6px;
   border-bottom: 1px dashed #dcdfd0;
   overflow-wrap: anywhere;
-  transition: background .2s;
+  transition: background 0.2s;
 }
 
 .log-line.last {
@@ -419,10 +415,9 @@ button:focus-visible {
   justify-content: space-between;
   align-items: center;
   padding: 5px 0;
-  font-size: .85rem;
+  font-size: 0.85rem;
 }
 
-/* Ringkasan & Starvation */
 .state-summary {
   background: var(--white);
   border: 1px solid var(--line);
@@ -450,7 +445,7 @@ button:focus-visible {
   border-radius: 6px;
   background: #fbe9e7;
   color: var(--red);
-  font-size: .82rem;
+  font-size: 0.82rem;
   font-weight: 700;
 }
 
@@ -460,16 +455,15 @@ button:focus-visible {
   color: var(--green);
 }
 
-/* Badge Status */
 .badge {
   display: inline-block;
   padding: 2px 10px;
   border-radius: 999px;
-  font-size: .75rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--white);
   background: var(--gray);
-  transition: transform .2s, background .2s;
+  transition: transform 0.2s, background 0.2s;
 }
 
 .badge.ready {
@@ -489,7 +483,7 @@ button:focus-visible {
   background: var(--navy);
 }
 
-/* Action Bar */
+/* 8. ACTION BAR BAWAH & TOMBOL INTERAKTIF */
 .actionbar {
   display: flex;
   flex-wrap: wrap;
@@ -505,18 +499,43 @@ button:focus-visible {
 .step-count {
   margin-left: auto;
   color: var(--muted);
-  font-size: .85rem;
+  font-size: 0.85rem;
   font-weight: 600;
 }
 
-.btn {
+.btn,
+.btn-compare,
+.btn-secondary,
+.btn-primary {
   border: 0;
   color: var(--white);
-  padding: 10px 22px;
   border-radius: 999px;
   font-weight: 600;
-  font-size: .95rem;
-  transition: transform .15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow .15s, filter .15s;
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s, filter 0.15s;
+}
+
+.btn {
+  padding: 10px 22px;
+  font-size: 0.95rem;
+}
+
+.btn-compare {
+  padding: 10px 18px;
+  font-size: 0.95rem;
+  background: var(--sage);
+  box-shadow: 0 3px 0 #586b5a;
+}
+
+.btn-secondary {
+  padding: 9px 18px;
+  background: var(--sage);
+  box-shadow: 0 3px 0 #586b5a;
+}
+
+.btn-primary {
+  padding: 9px 18px;
+  background: var(--deep-olive);
+  box-shadow: 0 3px 0 #4b5e26;
 }
 
 .btn.play {
@@ -535,44 +554,29 @@ button:focus-visible {
   box-shadow: 0 3px 0 var(--reset-dark);
 }
 
-.btn:hover:not(:disabled) {
+.btn:hover:not(:disabled),
+.btn-compare:hover,
+.btn-secondary:hover,
+.btn-primary:hover {
   transform: translateY(-2px);
   filter: brightness(1.06);
 }
 
-.btn:active:not(:disabled) {
+.btn:active:not(:disabled),
+.btn-compare:active,
+.btn-secondary:active,
+.btn-primary:active {
   transform: translateY(2px);
   box-shadow: none !important;
 }
 
 .btn:disabled {
-  opacity: .45;
+  opacity: 0.45;
   cursor: not-allowed;
   box-shadow: none;
 }
 
-.btn-compare {
-  background: var(--sage);
-  color: var(--white);
-  border: 0;
-  padding: 10px 18px;
-  border-radius: 999px;
-  font-weight: 600;
-  font-size: .95rem;
-  box-shadow: 0 3px 0 #586b5a;
-  transition: transform .15s, box-shadow .15s, filter .15s;
-}
-
-.btn-compare:hover {
-  transform: translateY(-2px);
-  filter: brightness(1.06);
-}
-
-.btn-compare:active {
-  transform: translateY(2px);
-  box-shadow: none;
-}
-
+/* 9. POP-UP MODAL PERBANDINGAN */
 .modal-overlay {
   display: none;
   position: fixed;
@@ -595,7 +599,7 @@ button:focus-visible {
   border-radius: 16px;
   padding: 24px;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
-  animation: popIn .18s ease-out;
+  animation: popIn 0.18s ease-out;
 }
 
 @keyframes popIn {
@@ -625,7 +629,7 @@ button:focus-visible {
 
 .modal-header p {
   margin: 0;
-  font-size: .85rem;
+  font-size: 0.85rem;
   color: var(--muted);
 }
 
@@ -636,7 +640,7 @@ button:focus-visible {
   color: var(--muted);
   padding: 4px 8px;
   border-radius: 8px;
-  transition: background .2s, color .2s;
+  transition: background 0.2s, color 0.2s;
 }
 
 .btn-close:hover {
@@ -667,7 +671,7 @@ button:focus-visible {
   padding: 14px 12px;
   text-align: center;
   border-bottom: 1px solid #ece9e0;
-  font-size: .9rem;
+  font-size: 0.9rem;
 }
 
 .compare-table th:first-child,
@@ -682,7 +686,7 @@ button:focus-visible {
   text-align: center;
   padding: 5px 12px;
   border-radius: 999px;
-  font-size: .8rem;
+  font-size: 0.8rem;
   font-weight: 600;
 }
 
@@ -703,41 +707,58 @@ button:focus-visible {
   margin-top: 20px;
 }
 
-.btn-secondary {
-  background: var(--sage);
-  color: var(--white);
-  border: 0;
-  padding: 9px 18px;
+/* 10. FIFO / FAIR & RESPONSIF */
+.rw-queue {
+  position: absolute;
+  left: 50%;
+  bottom: 2px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: max-content;
+  max-width: 100%;
+  padding: 5px 14px;
+  background: var(--panel);
+  border: 1.5px solid var(--line);
   border-radius: 999px;
-  font-weight: 600;
-  box-shadow: 0 3px 0 #586b5a;
-  transition: transform .15s, box-shadow .15s;
+  font-size: 0.8rem;
+  z-index: 2;
 }
 
-.btn-primary {
-  background: var(--deep-olive);
-  color: var(--white);
-  border: 0;
-  padding: 9px 18px;
+.rw-queue-title {
+  font-weight: 700;
+  color: var(--reset);
+}
+
+.q-chip {
+  display: inline-block;
+  padding: 1px 10px;
   border-radius: 999px;
-  font-weight: 600;
-  box-shadow: 0 3px 0 #4b5e26;
-  transition: transform .15s, box-shadow .15s;
+  border: 2px solid var(--blue);
+  background: var(--white);
+  color: var(--blue);
+  font-weight: 700;
 }
 
-.btn-secondary:hover,
-.btn-primary:hover {
-  transform: translateY(-2px);
-  filter: brightness(1.06);
+.q-chip.writer {
+  border-color: var(--orange);
+  color: var(--orange);
 }
 
-.btn-secondary:active,
-.btn-primary:active {
-  transform: translateY(2px);
-  box-shadow: none;
+.q-chip.head {
+  background: var(--yellow);
+  color: #3e2723;
+  box-shadow: 0 0 0 3px rgba(130, 156, 50, 0.35);
 }
 
-/* Responsif */
+.q-arrow,
+.q-empty {
+  color: var(--muted);
+}
+
 @media (max-width: 960px) {
   .sim-grid {
     grid-template-columns: 1fr;
@@ -767,7 +788,7 @@ button:focus-visible {
   }
 
   .rw-area {
-    aspect-ratio: .8 / 1;
+    aspect-ratio: 0.8 / 1;
   }
 
   .rw-area:has(.rw-node.reader:nth-child(9)) {
@@ -784,21 +805,27 @@ button:focus-visible {
 
   .rw-db {
     width: 36%;
-    font-size: .8rem;
+    font-size: 0.8rem;
     padding: 4px;
   }
 
   .rw-db small {
-    font-size: .65rem;
+    font-size: 0.65rem;
   }
 
   .rw-label {
-    font-size: .8rem;
+    font-size: 0.8rem;
   }
 
   .btn {
     padding: 9px 16px;
-    font-size: .88rem;
+    font-size: 0.88rem;
+  }
+
+  .rw-queue {
+    font-size: 0.7rem;
+    padding: 4px 8px;
+    gap: 4px;
   }
 }
 
@@ -807,65 +834,5 @@ button:focus-visible {
   .rw-node.running .avatar,
   .rw-line.waiting {
     animation: none;
-  }
-}
-
-/* ===== FIFO / Fair: tampilan antrean menunggu ===== */
-.rw-queue {
-  position: absolute;
-  left: 50%;
-  bottom: 2px;
-  transform: translateX(-50%);
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  width: max-content;
-  max-width: 100%;
-  padding: 5px 14px;
-  background: var(--panel);
-  border: 1.5px solid var(--line);
-  border-radius: 999px;
-  font-size: .8rem;
-  z-index: 2;
-}
-
-.rw-queue-title {
-  font-weight: 700;
-  color: var(--reset);
-}
-
-.q-chip {
-  display: inline-block;
-  padding: 1px 10px;
-  border-radius: 999px;
-  border: 2px solid var(--blue);
-  background: var(--white);
-  color: var(--blue);
-  font-weight: 700;
-}
-
-.q-chip.writer {
-  border-color: var(--orange);
-  color: var(--orange);
-}
-
-.q-chip.head {
-  background: var(--yellow);
-  color: #3e2723;
-  box-shadow: 0 0 0 3px rgba(130, 156, 50, .35);
-}
-
-.q-arrow,
-.q-empty {
-  color: var(--muted);
-}
-
-@media (max-width: 600px) {
-  .rw-queue {
-    font-size: .7rem;
-    padding: 4px 8px;
-    gap: 4px;
   }
 }
