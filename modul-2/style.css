@@ -509,11 +509,15 @@ button:focus-visible {
   background: #c59b99;
 }
 
-.eval-badge.baik {
+.eval-badge.cukup {
   background: #a5d6a7;
 }
 
-.eval-badge.cukup {
+.eval-badge.baik {
+  background: #66bb6a;
+}
+
+.eval-badge.terbaik {
   background: #4caf68;
 }
 
