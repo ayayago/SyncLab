@@ -8,8 +8,8 @@
   --line: #e0ddd5;
   --olive-green: #829c32;    
   --olive-dark: #637823;
-  --step: #f28b45;    
-  --step-dark: #c06427;
+  --step: #f28b55;    
+  --step-dark: #c86928;
   --reset: #a87538;    
   --reset-dark: #7d5423;
   --sage: #768e78;     
@@ -278,13 +278,11 @@ button:focus-visible {
   box-shadow: 0 3px 0 var(--olive-dark);
 }
 
-.btn.dark:nth-of-type(1),
 .btn.step {
   background: var(--step);
   box-shadow: 0 3px 0 var(--step-dark);
 }
 
-.btn.dark:nth-of-type(2),
 .btn.reset {
   background: var(--reset);
   box-shadow: 0 3px 0 var(--reset-dark);
