@@ -30,6 +30,8 @@ function initPhil({ mechanism, n }) {
     currentStep: 0,
     done: false,
     deadlock: false,
+    starvation: false,
+    starvedPhils: new Set(),
     room: n - 1,
     forks: Array(n).fill(null),
     ph: Array.from({ length: n }, (_, i) => ({
@@ -38,7 +40,8 @@ function initPhil({ mechanism, n }) {
       left: false,
       right: false,
       seat: false,
-      meals: 0
+      meals: 0,
+      hungrySince: 0
     })),
     logs: [`Step 0: Inisialisasi ${n} filsuf — ${MECH_LABEL[mechanism]}.`],
   };
@@ -54,6 +57,7 @@ function act(st, i, L) {
   if (p.state === 'done') return false;
   if (p.state === 'thinking') {
     p.state = 'hungry';
+    p.hungrySince = st.currentStep;
     L(`${nm} lapar`);
     return true;
   }
@@ -125,9 +129,27 @@ function stepPhil() {
     state.deadlock = true;
     state.done = true;
     L('DEADLOCK! Semua filsuf menunggu garpu satu sama lain.');
-  } else if (state.ph.every((p) => p.state === 'done')) {
-    state.done = true;
-    L(`Selesai. Semua filsuf sudah makan ${MEALS} kali tanpa deadlock ✓`);
+  } else {
+    // Cek indikasi starvation: filsuf lapar menunggu >= n * 3 langkah tanpa makan
+    const batasTunggu = state.n * 3;
+    state.ph.forEach((p, idx) => {
+      if (p.state === 'hungry' && (state.currentStep - p.hungrySince) >= batasTunggu) {
+        const nama = 'P' + (idx + 1);
+        if (!state.starvedPhils.has(nama)) {
+          state.starvedPhils.add(nama);
+          state.starvation = true;
+          L(`Indikasi STARVATION pada ${nama} (menunggu ${state.currentStep - p.hungrySince} langkah).`);
+        }
+      }
+    });
+
+    if (state.ph.every((p) => p.state === 'done')) {
+      state.done = true;
+      const catatan = state.starvation
+        ? `dengan indikasi starvation (${Array.from(state.starvedPhils).join(', ')})`
+        : 'tanpa deadlock maupun starvation ✓';
+      L(`Selesai. Semua filsuf sudah makan ${MEALS} kali ${catatan}`);
+    }
   }
 
   if (state.done) {
@@ -189,7 +211,7 @@ function render() {
   // 3. Render Log
   logBox.innerHTML = state.logs.map((line, idx) => {
     const isLast = idx === state.logs.length - 1;
-    const isBad = line.includes('DEADLOCK');
+    const isBad = line.includes('DEADLOCK') || line.includes('STARVATION');
     return `<div class="log-line ${isLast ? 'last' : ''} ${isBad ? 'bad' : ''}">${line}</div>`;
   }).join('');
   logBox.scrollTop = logBox.scrollHeight;
@@ -251,24 +273,29 @@ const NAMA_MEKANISME_PHIL = {
 function simpanHasilPhil(st) {
   const riwayat = JSON.parse(localStorage.getItem('syncLab_phil_results')) || {};
 
-  let statusDeadlock = 'Tidak ada';
-  let penilaian = 'Cukup';
-  let kelasBadge = 'cukup';
+  let statusMasalah = 'Tidak ada';
+  let penilaian = 'Terbaik';
+  let kelasBadge = 'terbaik';
 
   if (st.deadlock) {
-    statusDeadlock = 'Deadlock';
+    statusMasalah = 'Deadlock';
     penilaian = 'Buruk';
     kelasBadge = 'buruk';
+  } else if (st.starvation) {
+    const daftarStarved = Array.from(st.starvedPhils).join(', ');
+    statusMasalah = `Starvation (${daftarStarved})`;
+    penilaian = 'Cukup';
+    kelasBadge = 'cukup';
   } else if (st.mechanism === 'semaphore') {
-    penilaian = 'Baik';
-    kelasBadge = 'baik';
+    penilaian = 'Cukup';
+    kelasBadge = 'cukup';
   }
 
   riwayat[st.mechanism] = {
     mekanisme: NAMA_MEKANISME_PHIL[st.mechanism],
     jumlahProses: st.n,
     jumlahStep: st.currentStep,
-    status: statusDeadlock,
+    status: statusMasalah,
     penilaian: penilaian,
     kelasBadge: kelasBadge
   };
